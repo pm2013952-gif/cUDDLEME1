@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JSON | CuddleMe</title>
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="top"><a class="brand" href="index.html"><img src="logo.svg" alt="" width="40" height="40"><span>CuddleMe</span></a>
+<nav aria-label="Principal"><a href="index.html">Inicio</a><a href="javascript.html">JavaScript</a><a href="jquery.html">jQuery</a><a href="json.html" aria-current="page">JSON</a><a href="hosting.html">Hosting y Dominios</a><a href="cuestionario.html">Cuestionario Web</a></nav></header>
+<main class="page"><div class="wrap"><h1>JSON (JavaScript Object Notation)</h1>
+<p class="lead">JSON es un formato de texto para representar datos. Es ligero, fácil de leer para una persona y fácil de procesar para casi cualquier lenguaje de programación. Por eso es el estándar para intercambiar datos entre aplicaciones y servidores: un peluche de CuddleMe, con su nombre, color y mensaje, puede viajar como JSON del formulario a la fábrica.</p>
+<h2>Estructura básica</h2>
+<ul><li><strong>Objeto:</strong> conjunto de pares clave-valor entre llaves <code>{ }</code>.</li><li><strong>Arreglo:</strong> lista ordenada de valores entre corchetes <code>[ ]</code>.</li><li><strong>Valores permitidos:</strong> texto, número, <code>true</code> o <code>false</code>, <code>null</code>, objetos y arreglos.</li><li><strong>Regla clave:</strong> las claves y los textos siempre van entre comillas dobles.</li></ul>
+<h2>Objeto de JavaScript y cadena JSON</h2>
+<p>Se parecen mucho, pero son cosas distintas: el objeto vive dentro del programa, y la cadena JSON es texto que se puede guardar o enviar.</p>
+<div class="two"><div><h3>Objeto JS</h3><pre><code>const peluche = {
+  nombre: &quot;Osito&quot;,
+  color: &quot;rosa&quot;,
+  accesorios: [&quot;lazo&quot;, &quot;gorro&quot;],
+  ropita: &quot;camiseta&quot;,
+  mensaje: &quot;Te quiero mucho&quot;,
+  personalizado: true
+};</code></pre></div><div><h3>Cadena JSON</h3><pre><code>{
+  &quot;nombre&quot;: &quot;Osito&quot;,
+  &quot;color&quot;: &quot;rosa&quot;,
+  &quot;accesorios&quot;: [&quot;lazo&quot;, &quot;gorro&quot;],
+  &quot;ropita&quot;: &quot;camiseta&quot;,
+  &quot;mensaje&quot;: &quot;Te quiero mucho&quot;,
+  &quot;personalizado&quot;: true
+}</code></pre></div></div>
+<div class="scroll"><table><thead><tr><th>Diferencia</th><th>Objeto JS</th><th>JSON</th></tr></thead><tbody><tr><td>Claves</td><td>Con o sin comillas</td><td>Siempre con comillas dobles</td></tr><tr><td>Comillas simples</td><td>Permitidas</td><td>No permitidas</td></tr><tr><td>Funciones y comentarios</td><td>Permitidos</td><td>No permitidos</td></tr></tbody></table></div>
+<p>Dos métodos convierten entre ambos: <code>JSON.stringify(objeto)</code> crea la cadena y <code>JSON.parse(cadena)</code> vuelve a crear el objeto.</p>
+<h2>Pruébalo</h2>
+<pre><code>const texto = document.getElementById(&#x27;entrada&#x27;).value;
+try {
+  const objeto = JSON.parse(texto);   // cadena JSON -&gt; objeto JS
+  salida.textContent = &#x27;Válido. El peluche se llama &#x27; + objeto.nombre;
+} catch (error) {
+  salida.textContent = &#x27;JSON inválido: &#x27; + error.message;
+}</code></pre>
+<div class="demo"><div style="flex-basis:100%"><label for="entrada"><strong>Edita el JSON y pulsa el botón:</strong></label>
+<textarea id="entrada" rows="8">{
+  &quot;nombre&quot;: &quot;Osito&quot;,
+  &quot;color&quot;: &quot;rosa&quot;,
+  &quot;accesorios&quot;: [&quot;lazo&quot;, &quot;gorro&quot;],
+  &quot;ropita&quot;: &quot;camiseta&quot;,
+  &quot;mensaje&quot;: &quot;Te quiero mucho&quot;,
+  &quot;personalizado&quot;: true
+}</textarea></div>
+<button id="btn-json" class="btn">Convertir con JSON.parse</button> <span id="salida" aria-live="polite"></span></div>
+<h2>Cómo lo usan las aplicaciones web</h2>
+<p>Cuando una página necesita datos (por ejemplo, el estado de un pedido), el navegador envía una petición a un servidor o a una API. El servidor responde con texto en formato JSON, y el código de la página lo convierte en objetos para mostrarlo en pantalla. También funciona al revés: al enviar el formulario de personalización, la página manda los datos del peluche como JSON.</p>
+<pre><code>fetch(&#x27;https://api.ejemplo.com/pedidos/1&#x27;)
+  .then(respuesta =&gt; respuesta.json())      // lee la respuesta como JSON
+  .then(datos =&gt; console.log(datos.peluche.nombre));</code></pre><section class="bib"><h2>Recursos y bibliografía</h2><ul><li><a href="https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/JSON">MDN: JSON</a></li><li><a href="https://www.json.org/json-es.html">JSON.org (especificación)</a></li><li><a href="https://www.w3schools.com/js/js_json_intro.asp">W3Schools: JSON Tutorial</a></li></ul></section></div></main>
+<footer><p>CuddleMe es una marca creada para un proyecto académico de desarrollo web.</p></footer>
+<script>
+document.getElementById('btn-json').addEventListener('click', function () {
+  const salida = document.getElementById('salida');
+const texto = document.getElementById('entrada').value;
+try {
+  const objeto = JSON.parse(texto);   // cadena JSON -> objeto JS
+  salida.textContent = 'Válido. El peluche se llama ' + objeto.nombre;
+} catch (error) {
+  salida.textContent = 'JSON inválido: ' + error.message;
+}
+});
+</script>
+</body></html>

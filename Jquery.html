@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>jQuery | CuddleMe</title>
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="top"><a class="brand" href="index.html"><img src="logo.svg" alt="" width="40" height="40"><span>CuddleMe</span></a>
+<nav aria-label="Principal"><a href="index.html">Inicio</a><a href="javascript.html">JavaScript</a><a href="jquery.html" aria-current="page">jQuery</a><a href="json.html">JSON</a><a href="hosting.html">Hosting y Dominios</a><a href="cuestionario.html">Cuestionario Web</a></nav></header>
+<main class="page"><div class="wrap"><h1>jQuery</h1>
+<p class="lead">jQuery es una librería de JavaScript lanzada en 2006. Nació porque los navegadores de esa época interpretaban el JavaScript de formas distintas, y escribir código que funcionara en todos era difícil. jQuery ofrecía una manera corta y uniforme de hacerlo, con el lema de escribir menos y hacer más.</p>
+<h2>Sintaxis básica</h2>
+<p>El símbolo <code>$</code> es la función principal de jQuery. El patrón siempre es el mismo: seleccionar un elemento y aplicarle una acción.</p>
+<pre><code>$(&#x27;selector&#x27;).accion();
+
+$(&#x27;#mensaje&#x27;).text(&#x27;Te quiero mucho&#x27;);   // selecciona por id y cambia el texto
+$(&#x27;.tarjeta&#x27;).hide();                   // selecciona por clase y oculta</code></pre>
+<p>Para usarla hay que cargar el archivo de jQuery antes de tu código, por ejemplo desde un CDN:</p>
+<pre><code>&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js&quot;&gt;&lt;/script&gt;</code></pre>
+<h2>Ventajas y desventajas frente a JavaScript moderno</h2>
+<div class="two"><div><h3>Ventajas</h3><ul><li>Sintaxis corta y fácil de leer.</li><li>Efectos y animaciones listos para usar.</li><li>Hay mucho código y plugins existentes, por eso aún aparece en proyectos antiguos.</li></ul></div>
+<div><h3>Desventajas</h3><ul><li>Es una descarga extra que hace la página más pesada.</li><li>Casi todo lo que resolvía ya existe en JavaScript moderno (<code>querySelector</code>, <code>classList</code>, <code>fetch</code>).</li><li>Los frameworks actuales usan otro enfoque y no dependen de jQuery.</li></ul></div></div>
+<h2>Comparación: JS vanilla y jQuery</h2>
+<p>La misma tarea escrita de las dos formas, lado a lado:</p>
+<div class="scroll"><table><thead><tr><th>Tarea</th><th>JS vanilla</th><th>jQuery</th></tr></thead><tbody><tr><td>Seleccionar un elemento</td><td><code>const t = document.querySelector(&#x27;#nombre-peluche&#x27;);</code></td><td><code>const t = $(&#x27;#nombre-peluche&#x27;);</code></td></tr><tr><td>Escuchar un clic</td><td><code>btn.addEventListener(&#x27;click&#x27;, f);</code></td><td><code>$(&#x27;#btn&#x27;).on(&#x27;click&#x27;, f);</code></td></tr><tr><td>Ocultar un elemento</td><td><code>caja.style.display = &#x27;none&#x27;;</code></td><td><code>$(&#x27;#caja&#x27;).hide();</code></td></tr><tr><td>Agregar una clase</td><td><code>caja.classList.add(&#x27;destacado&#x27;);</code></td><td><code>$(&#x27;#caja&#x27;).addClass(&#x27;destacado&#x27;);</code></td></tr><tr><td>Cambiar el texto</td><td><code>t.textContent = &#x27;Osito&#x27;;</code></td><td><code>$(&#x27;#nombre-peluche&#x27;).text(&#x27;Osito&#x27;);</code></td></tr></tbody></table></div>
+<h2>Efectos típicos</h2>
+<p>Dos efectos clásicos de jQuery: <code>fadeIn</code> (aparecer poco a poco) y <code>slideToggle</code> (abrir y cerrar deslizando). Pruébalos:</p>
+<pre><code>$(&#x27;#btn-fade&#x27;).on(&#x27;click&#x27;, function () {
+  $(&#x27;#caja&#x27;).hide().fadeIn(600);        // el mensaje aparece suavemente
+});
+$(&#x27;#btn-slide&#x27;).on(&#x27;click&#x27;, function () {
+  $(&#x27;#panel&#x27;).slideToggle(400);         // la lista se desliza abierta o cerrada
+});</code></pre>
+<div class="demo"><button id="btn-fade" class="btn">fadeIn: ver mensaje</button> <button id="btn-slide" class="btn">slideToggle: ver accesorios</button>
+<div id="caja" class="box">💌 “Un abrazo que puedes personalizar.”</div>
+<div id="panel" class="box alt"><strong>Accesorios disponibles:</strong> lazo, gorro de fiesta, corona, bufanda y lentes.</div></div>
+<section class="bib"><h2>Recursos y bibliografía</h2><ul><li><a href="https://api.jquery.com/">jQuery API Documentation</a></li><li><a href="https://jquery.com/">jQuery: sitio oficial</a></li><li><a href="https://www.w3schools.com/jquery/">W3Schools: jQuery Tutorial</a></li></ul></section></div></main>
+<footer><p>CuddleMe es una marca creada para un proyecto académico de desarrollo web.</p></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+$('#btn-fade').on('click', function () {
+  $('#caja').hide().fadeIn(600);        // el mensaje aparece suavemente
+});
+$('#btn-slide').on('click', function () {
+  $('#panel').slideToggle(400);         // la lista se desliza abierta o cerrada
+});
+</script>
+</body></html>

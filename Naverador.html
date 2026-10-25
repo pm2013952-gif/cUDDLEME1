@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="light"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CuddleMe</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Ctext y=%2752%27 font-size=%2752%27%3E%F0%9F%A7%B8%3C/text%3E%3C/svg%3E">
+<!-- Se aplica el tema guardado antes de pintar la página para evitar un parpadeo blanco. -->
+<script>
+(function () {
+  var tema = 'light';
+  try {
+    tema = localStorage.getItem('cuddle-tema') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  } catch (e) {}
+  document.documentElement.setAttribute('data-bs-theme', tema);
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<!-- Bootstrap 5.3: sistema de rejilla, navbar, tarjetas, modal, carrusel y temas claro/oscuro. -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+/* ==================== VARIABLES Y TEMAS ==================== */
+/* Colores de marca (iguales en ambos temas) y colores que cambian con el tema. */
+:root,[data-bs-theme=light]{
+  --rosa:#F7A8B8;--cielo:#8EC5E8;--cacao:#5A3A31;
+  --bg:#FFF3F6;--surface:#fff;--ink:#5A3A31;--line:#f0c9d2;
+  --strong:#5A3A31;--on-strong:#fff;--hero:#F7A8B8;--code-bg:#5A3A31;
+  --bs-body-bg:#FFF3F6;--bs-body-color:#5A3A31;
+}
+[data-bs-theme=dark]{
+  --bg:#1d1517;--surface:#2a1e21;--ink:#f4e4e8;--line:#4a3036;
+  --strong:#F7A8B8;--on-strong:#2a1519;--hero:#3a2027;--code-bg:#130d0e;
+  --bs-body-bg:#1d1517;--bs-body-color:#f4e4e8;
+}
+
+/* ==================== ESTILOS GENERALES ==================== */
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:1.0625rem/1.65 Nunito,system-ui,sans-serif;transition:background-color .35s ease,color .35s ease}
+h1,h2,h3{font-family:"Baloo 2",Nunito,system-ui,sans-serif;line-height:1.1;color:var(--ink)}
+h1{font-size:clamp(2.8rem,8vw,4.8rem);margin:0}h2{font-size:1.8rem;margin:2.5rem 0 .75rem}h3{font-size:1.25rem}
+a{color:var(--ink);text-decoration-color:var(--rosa);text-decoration-thickness:3px;text-underline-offset:3px}
+a:hover{color:var(--ink)}
+:focus-visible{outline:3px solid var(--cielo)!important;outline-offset:2px}
+.wrap{max-width:62rem;margin:0 auto;padding:0 1.25rem 1rem}
+.lead{font-size:1.3rem;font-weight:400;max-width:34rem}
+.hero .lead{margin:.5rem 0 1.25rem;font-weight:700}
+.page .lead{max-width:42rem}
+code{font:.92em ui-monospace,Consolas,monospace;background:var(--surface);color:var(--ink);padding:.05em .3em}
+pre{background:var(--code-bg);color:#fff;padding:1rem;overflow-x:auto;border-left:6px solid var(--rosa);line-height:1.5;border-radius:0 12px 12px 0}
+pre code{background:none;padding:0;color:inherit}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;background:var(--surface);margin:1rem 0;color:var(--ink)}
+th,td{text-align:left;padding:.6rem .8rem;border:2px solid var(--line);vertical-align:top}
+th{background:var(--rosa);color:#5A3A31}
+
+/* ==================== BARRA DE NAVEGACIÓN (Bootstrap navbar) ==================== */
+.navbar{background:var(--surface);border-bottom:4px solid var(--rosa);padding-top:.7rem;padding-bottom:.7rem;transition:padding .25s ease,box-shadow .25s ease,background-color .35s ease}
+.navbar.scrolled{padding-top:.3rem;padding-bottom:.3rem;box-shadow:0 6px 18px rgba(90,58,49,.18)}
+.brand{display:flex;align-items:center;gap:.6rem;font:700 1.5rem "Baloo 2",sans-serif;color:var(--ink);text-decoration:none}
+.brand svg{background:#FFF3F6;border-radius:50%;padding:2px}
+.navbar .nav-link{color:var(--ink);font-weight:700;border-bottom:3px solid transparent;padding:.25rem 0;margin:0 .6rem;transition:border-color .2s}
+.navbar .nav-link:hover,.navbar .nav-link.active{color:var(--ink);border-bottom-color:var(--rosa)}
+.navbar-toggler{border:3px solid var(--ink);color:var(--ink);font-size:1.3rem;line-height:1;padding:.25rem .6rem}
+.tema-btn{border:3px solid var(--ink);background:var(--surface);color:var(--ink);border-radius:999px;padding:.2rem .8rem;font-weight:800;cursor:pointer;transition:background-color .2s,transform .2s}
+.tema-btn:hover{background:var(--cielo);color:#5A3A31}
+.tema-btn:active{transform:scale(.95)}
+
+/* ==================== BOTONES (Bootstrap .btn con colores de marca) ==================== */
+.btn-cuddle{--bs-btn-color:#5A3A31;--bs-btn-bg:var(--rosa);--bs-btn-border-color:var(--ink);--bs-btn-hover-color:#5A3A31;--bs-btn-hover-bg:var(--cielo);--bs-btn-hover-border-color:var(--ink);--bs-btn-active-color:#5A3A31;--bs-btn-active-bg:var(--cielo);--bs-btn-active-border-color:var(--ink);--bs-btn-border-width:3px;--bs-btn-border-radius:999px;font:700 1.05rem "Baloo 2",sans-serif;padding:.45rem 1.2rem;transition:background-color .2s,transform .15s}
+.btn-cuddle:active{transform:scale(.96)}
+.hero .btn-cuddle{--bs-btn-bg:var(--surface);--bs-btn-color:var(--ink);--bs-btn-hover-color:#5A3A31}
+
+/* ==================== SECCIÓN HERO Y PERSONALIZADOR ==================== */
+.hero{background:var(--hero);padding:2.5rem 0;transition:background-color .35s ease}
+.f{display:block;font-weight:800;margin:.8rem 0 .2rem}
+.form-control{font:1rem Nunito,sans-serif;padding:.5rem .7rem;border:3px solid var(--ink);border-radius:0;background-color:var(--surface);color:var(--ink)}
+.form-control:focus{background-color:var(--surface);color:var(--ink);border-color:var(--ink);box-shadow:0 0 0 .25rem rgba(142,197,232,.6)}
+.form-control::placeholder{color:var(--ink);opacity:.55}
+.hero .form-control{max-width:22rem}
+.stage{background:#FFF3F6;color:#5A3A31;border:4px solid #5A3A31;padding:1rem;text-align:center;max-width:22rem;margin:0 auto}
+.stage svg{width:100%;max-width:15rem;height:auto}
+.stage .hola{font:700 1.5rem "Baloo 2",sans-serif;margin:0}
+.nota{background:#fff;border:3px dashed var(--cielo);padding:.6rem .8rem;margin:.75rem 0 0;min-height:3rem}
+@media (min-width:992px){.stage{position:sticky;top:5.5rem}}
+.g{border:0;padding:0;margin:.9rem 0}.g legend{font-weight:800;padding:0;margin-bottom:.3rem;font-size:1.0625rem;font-family:Nunito,sans-serif;float:none}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem}.chips label{position:relative;cursor:pointer;display:block}
+.chips input{position:absolute;opacity:0}
+.chips .t{display:block;padding:.3rem .85rem;background:var(--surface);border:3px solid var(--ink);border-radius:999px;font-weight:700;transition:background-color .2s,color .2s}
+.chips input:checked+.t{background:var(--strong);color:var(--on-strong)}
+.chips input:focus-visible+.t,.chips input:focus-visible+.cs{outline:4px solid var(--cielo);outline-offset:2px}
+.cs{display:block;width:2.6rem;height:2.6rem;border-radius:50%;border:3px solid var(--ink)}
+.chips input:checked+.cs{outline:4px solid var(--ink);outline-offset:2px}
+.ver{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ==================== PÁGINA DE INICIO ==================== */
+.facts{display:grid;grid-template-columns:11rem 1fr;gap:.75rem 1.5rem}.facts dt{font-weight:800}.facts dd{margin:0}
+.opts{display:flex;flex-wrap:wrap;gap:.5rem;list-style:none;padding:0}.opts li{background:var(--surface);border:3px solid var(--rosa);padding:.3rem .8rem;font-weight:700}
+.swatch{display:flex;gap:1rem;background:var(--surface);border:3px solid var(--line);padding:1rem;height:100%}
+.swatch p{margin:.1rem 0 0}
+.chip{flex:none;width:3.5rem;height:3.5rem;border:3px solid var(--ink);border-radius:50%}
+.logo-row{display:flex;flex-wrap:wrap;gap:1.5rem}
+.logo-row svg{background:#fff;border:3px solid var(--ink);padding:1rem}.logo-row svg.dk{background:#5A3A31}.logo-row svg.pk{background:var(--rosa)}
+@media (max-width:40rem){.facts{grid-template-columns:1fr}.facts dd{margin-bottom:.5rem}}
+
+/* Carrusel con crossfade (Bootstrap .carousel-fade) */
+.slide{display:flex;flex-direction:column;align-items:center;gap:1rem;background:linear-gradient(135deg,var(--s1),var(--s2));color:#5A3A31;border:4px solid var(--ink);border-radius:1.5rem;padding:1.5rem 3.5rem;min-height:23rem;justify-content:center}
+@media (min-width:768px){.slide{flex-direction:row;gap:2rem}}
+.slide h3{color:#5A3A31;font-size:1.7rem}
+.slide p{margin:0;font-weight:700;max-width:26rem}
+.slide-img{width:11rem;height:auto;flex:none}
+.carousel-control-prev-icon,.carousel-control-next-icon{filter:invert(1)}
+.carousel-indicators{position:static;margin:.9rem 0 0;justify-content:center}
+.carousel-indicators [data-bs-target]{background-color:var(--ink);width:2.2rem;height:.45rem;border:0;border-radius:99px}
+.carousel-controls-row{display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap}
+.carousel-controls-row .carousel-indicators{margin:.9rem 0 0}
+
+/* ==================== PÁGINAS EDUCATIVAS ==================== */
+.page-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;margin-top:1.5rem}
+.page-head h1{margin-top:0}
+.banner-bear{width:9rem;height:auto;flex:none;background:var(--hero);border:4px solid var(--ink);border-radius:50% 50% 1.5rem 1.5rem;padding:.6rem}
+.demo{background:var(--surface);border:3px solid var(--ink);padding:1rem;margin:1rem 0;display:flex;flex-wrap:wrap;align-items:center;gap:.75rem 1rem}
+.bib{margin-top:2.5rem;border-top:3px solid var(--rosa)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(18rem,1fr));gap:0 1.5rem}
+.box{background:var(--surface);border:3px solid var(--cielo);padding:1rem;margin:.5rem 0;flex-basis:100%}.box.alt{border-color:var(--rosa)}
+#caja{display:none}
+textarea.form-control{font:.95rem ui-monospace,Consolas,monospace;margin:.5rem 0}
+.anat{font:700 2rem "Baloo 2",sans-serif;margin:1rem 0}.anat .p{padding:.1rem .5rem;border-radius:10px}
+.sub{background:var(--cielo);color:#5A3A31}.dom{background:var(--strong);color:var(--on-strong)}.tld{background:var(--rosa);color:#5A3A31}
+.flow{list-style:none;counter-reset:s;padding:0}
+.flow li{counter-increment:s;position:relative;background:var(--surface);border-left:6px solid var(--rosa);padding:.7rem 1rem .7rem 3rem;margin:0 0 1.1rem}
+.flow li::before{content:counter(s);position:absolute;left:.8rem;font:700 1.2rem "Baloo 2",sans-serif}
+.flow li:not(:last-child)::after{content:"";position:absolute;left:1.05rem;bottom:-1rem;border:.4rem solid transparent;border-top-color:var(--rosa)}
+
+/* ==================== PÁGINA: IA DE GOOGLE ==================== */
+.filtros{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:1.25rem 0 .5rem}
+.filtros .form-control{max-width:15rem;border-radius:999px}
+.tool{background:var(--surface);border:3px solid var(--ink);border-radius:1.25rem;overflow:hidden;color:var(--ink);transition:transform .2s ease,box-shadow .2s ease}
+.tool:hover{transform:translateY(-4px);box-shadow:0 10px 0 var(--rosa)}
+.tool-banner{height:7.5rem;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--g1),var(--g2));border-bottom:3px solid var(--ink);font-size:3.4rem}
+.tool h3{margin:.4rem 0 .3rem;color:var(--ink)}
+.tool p{font-size:.98rem;margin-bottom:1rem}
+.cat{display:inline-block;align-self:flex-start;font-weight:800;font-size:.85rem;padding:.1rem .7rem;border-radius:999px;border:2px solid #5A3A31;color:#5A3A31}
+.cat-estudio{background:var(--cielo)}.cat-creatividad{background:var(--rosa)}.cat-desarrollo{background:#F6C945}
+.pop{animation:pop .35s ease both}
+@keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+.modal-content{background:var(--surface);color:var(--ink);border:4px solid var(--ink);border-radius:1.25rem}
+.modal-header,.modal-footer{border-color:var(--line)}
+.modal-title{font:700 1.6rem "Baloo 2",sans-serif;color:var(--ink)}
+.idea{background:var(--bg);border-left:6px solid var(--cielo);padding:.7rem 1rem;margin:1rem 0 0}
+.nota-pie{background:var(--surface);border:3px dashed var(--cielo);padding:.8rem 1rem;margin-top:1.5rem}
+
+/* ==================== CUESTIONARIO ==================== */
+.q{background:var(--surface);border:3px solid var(--ink);margin:0 0 1.25rem;padding:1rem 1.25rem}
+.q legend{font:700 1.15rem "Baloo 2",sans-serif;padding:0 .4rem;float:none;width:auto;margin-bottom:.4rem}
+.q label{display:block;padding:.45rem .7rem;margin:.25rem 0;border:3px solid transparent;border-radius:12px;cursor:pointer;transition:border-color .2s}
+.q label:hover{border-color:var(--rosa)}
+.q .right{background:#DDF1E4;border-color:#3E8E5A;color:#16301f}.q .wrong{background:#FBE0E0;border-color:#B3261E;color:#4a1411}
+.fb{margin:.6rem 0 0;font-weight:700}
+.result{background:var(--strong);color:var(--on-strong);padding:1.25rem;font:700 1.4rem "Baloo 2",sans-serif;margin:1.5rem 0}
+
+/* ==================== NAVEGACIÓN SUAVE Y EXTRAS ==================== */
+main{transition:opacity .18s ease}
+main.saliendo{opacity:0}
+.vista{display:none}.vista.on{display:block;animation:entra .45s ease both}
+@keyframes entra{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.subir{position:fixed;right:max(1rem,env(safe-area-inset-right,0px));bottom:max(1rem,env(safe-area-inset-bottom,0px));width:3rem;height:3rem;border-radius:50%;border:3px solid var(--ink);background:var(--rosa);color:#5A3A31;font-size:1.3rem;font-weight:800;cursor:pointer;opacity:0;pointer-events:none;transform:translateY(12px);transition:opacity .25s,transform .25s;z-index:1030}
+.subir.visible{opacity:1;pointer-events:auto;transform:none}
+footer{max-width:62rem;margin:2rem auto 0;padding:1.25rem;border-top:1px solid var(--line);font-size:.95rem}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+</style>
+</head><body>
+<!-- SVG oculto que define el logotipo reutilizable de CuddleMe. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="logo" viewBox="0 0 64 64">
+<circle cx="17" cy="19" r="9" fill="#F7A8B8" stroke="#5A3A31" stroke-width="2.5"/><circle cx="17" cy="19" r="4.2" fill="#8EC5E8"/>
+<circle cx="47" cy="19" r="9" fill="#F7A8B8" stroke="#5A3A31" stroke-width="2.5"/><circle cx="47" cy="19" r="4.2" fill="#8EC5E8"/>
+<circle cx="32" cy="36" r="23" fill="#F7A8B8" stroke="#5A3A31" stroke-width="2.5"/>
+<ellipse cx="32" cy="45" rx="10.5" ry="7.5" fill="#FFF3F6"/>
+<circle cx="21" cy="42" r="3.2" fill="#F28FA6" opacity=".7"/><circle cx="43" cy="42" r="3.2" fill="#F28FA6" opacity=".7"/>
+<circle cx="23.5" cy="32" r="2.5" fill="#5A3A31"/><circle cx="40.5" cy="32" r="2.5" fill="#5A3A31"/>
+<ellipse cx="32" cy="41.5" rx="3.3" ry="2.4" fill="#5A3A31"/>
+<path d="M32 44v3M32 47q-3 2.6-6 0M32 47q3 2.6 6 0" fill="none" stroke="#5A3A31" stroke-width="1.8" stroke-linecap="round"/>
+</symbol></svg>
+
+<!-- Encabezado principal: navbar de Bootstrap con logotipo, menú y botón de tema claro/oscuro. -->
+<nav class="navbar navbar-expand-xl sticky-top" id="barra" aria-label="Principal">
+  <div class="container-fluid px-3 px-xl-4">
+    <a class="brand navbar-brand m-0" href="#inicio"><svg width="40" height="40" aria-hidden="true"><use href="#logo"/></svg><span>CuddleMe</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Abrir menú">☰</button>
+    <div class="collapse navbar-collapse" id="menu">
+      <ul class="navbar-nav ms-xl-4 me-auto mb-2 mb-xl-0">
+        <li class="nav-item"><a class="nav-link" href="#inicio">Inicio</a></li>
+        <li class="nav-item"><a class="nav-link" href="#javascript">JavaScript</a></li>
+        <li class="nav-item"><a class="nav-link" href="#jquery">jQuery</a></li>
+        <li class="nav-item"><a class="nav-link" href="#json">JSON</a></li>
+        <li class="nav-item"><a class="nav-link" href="#hosting">Hosting y Dominios</a></li>
+        <li class="nav-item"><a class="nav-link" href="#ia">IA de Google</a></li>
+        <li class="nav-item"><a class="nav-link" href="#cuestionario">Cuestionario Web</a></li>
+        <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
+      </ul>
+      <div class="d-flex flex-wrap gap-2"><button id="tema" class="tema-btn" type="button" aria-pressed="false"><span id="tema-icono" aria-hidden="true">🌙</span> <span id="tema-txt">Modo oscuro</span></button>
+      <button id="idioma" class="tema-btn" type="button" aria-label="Switch to English / Cambiar a español" title="English / Español"><span aria-hidden="true">🌐</span> <span id="idioma-txt">EN</span></button></div>
+    </div>
+  </div>
+</nav>
+
+<!-- Contenido principal del sitio. La clase "vista" permite cambiar entre secciones. -->
+<main><section class="vista" id="inicio">
+<!-- Sección principal donde el usuario personaliza su peluche. -->
+<section class="hero"><div class="container"><div class="row g-4 g-lg-5 align-items-start">
+<div class="col-lg-6 order-2 order-lg-1"><h1>CuddleMe</h1>
+<p class="lead">Un abrazo que puedes personalizar. Empieza con un peluche liso y hazlo tuyo.</p>
+<div id="ctrl"></div>
+<label class="f" for="nombre">Nombre</label><input id="nombre" class="form-control" type="text" placeholder="Osito" maxlength="16">
+<label class="f" for="msg">Mensaje especial</label><input id="msg" class="form-control" type="text" placeholder="Feliz cumpleaños, te quiero mucho" maxlength="60">
+<p class="mt-3"><button id="reset" class="btn btn-cuddle" type="button">Empezar de nuevo</button></p></div>
+<div class="col-lg-6 order-1 order-lg-2"><div class="stage" aria-live="polite"><div id="escena"></div><p class="hola" id="hola"></p><p class="nota" id="nota"></p></div></div>
+</div></div></section>
+<div class="wrap">
+<!-- Galería: carrusel de Bootstrap con efecto crossfade (clase carousel-fade). -->
+<section><h2>Galería de peluches</h2>
+<div id="galeria" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="4500" data-bs-pause="false" aria-roledescription="carrusel" aria-label="Galería de peluches CuddleMe">
+  <div class="carousel-inner">
+    <div class="carousel-item active"><div class="slide" style="--s1:#FFE3EA;--s2:#F7A8B8"><img class="slide-img" data-oso="lazo" alt="Oso clásico marrón con un lazo azul en la cabeza y almohadillas en las patitas" width="176" height="211"><div><h3>Clásico con lazo</h3><p>El favorito para cumpleaños: marrón cálido, almohadillas rosas y un lazo que lo hace especial.</p></div></div></div>
+    <div class="carousel-item"><div class="slide" style="--s1:#E4F2FB;--s2:#8EC5E8"><img class="slide-img" data-oso="panda" alt="Panda con lentes y almohadillas" width="176" height="211"><div><h3>Panda estudioso</h3><p>Con lentes puestos, listo para acompañar una graduación o regalarle ánimo a alguien en exámenes.</p></div></div></div>
+    <div class="carousel-item"><div class="slide" style="--s1:#EEF6FB;--s2:#C9B6E8"><img class="slide-img" data-oso="polar" alt="Oso polar con bufanda azul y zapatitos" width="176" height="211"><div><h3>Polar con bufanda</h3><p>Pensado para abrazar en días fríos. Los zapatitos y la bufanda combinan en tono.</p></div></div></div>
+    <div class="carousel-item"><div class="slide" style="--s1:#FFF3C9;--s2:#F6C945"><img class="slide-img" data-oso="corona" alt="Oso dorado con corona y camiseta con corazón" width="176" height="211"><div><h3>Dorado con corona</h3><p>Para aniversarios y San Valentín: camiseta con corazón y corona de rey o reina.</p></div></div></div>
+    <div class="carousel-item"><div class="slide" style="--s1:#F1E8FB;--s2:#C9B6E8"><img class="slide-img" data-oso="gatito" alt="Oso lila con orejas de gatito y lentes" width="176" height="211"><div><h3>Lila con orejas de gatito</h3><p>Una mezcla divertida de oso y gatito. Las combinaciones se eligen en el personalizador de arriba.</p></div></div></div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#galeria" data-bs-slide="prev"><span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="visually-hidden">Anterior</span></button>
+  <button class="carousel-control-next" type="button" data-bs-target="#galeria" data-bs-slide="next"><span class="carousel-control-next-icon" aria-hidden="true"></span><span class="visually-hidden">Siguiente</span></button>
+  <div class="carousel-controls-row">
+    <div class="carousel-indicators">
+      <button type="button" data-bs-target="#galeria" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Diapositiva 1"></button>
+      <button type="button" data-bs-target="#galeria" data-bs-slide-to="1" aria-label="Diapositiva 2"></button>
+      <button type="button" data-bs-target="#galeria" data-bs-slide-to="2" aria-label="Diapositiva 3"></button>
+      <button type="button" data-bs-target="#galeria" data-bs-slide-to="3" aria-label="Diapositiva 4"></button>
+      <button type="button" data-bs-target="#galeria" data-bs-slide-to="4" aria-label="Diapositiva 5"></button>
+    </div>
+    <button id="galeria-pausa" class="btn btn-cuddle btn-sm mt-3" type="button">Pausar</button>
+  </div>
+</div></section>
+
+<!-- Información general sobre el producto CuddleMe. -->
+<section><h2>El producto</h2>
+<dl class="facts"><dt>Nombre comercial</dt><dd>CuddleMe</dd>
+<dt>Descripción</dt><dd>CuddleMe crea peluches suaves hechos a pedido. Cada cliente diseña el suyo en la página: elige el tipo de oso (clásico, panda, polar o dorado), el color, las orejas, las patitas, los accesorios, la ropita, el nombre y un mensaje especial que llega en una tarjeta con el peluche. Los ojos son bordados para que sean seguros para niños pequeños, y cada pieza se prepara con cariño antes de enviarse.</dd>
+<dt>Se personaliza con</dt><dd><ul class="opts"><li>Tipo de oso</li><li>Color</li><li>Orejas</li><li>Patitas</li><li>Accesorios</li><li>Ropita</li><li>Nombre y mensaje</li></ul></dd>
+<dt>Público objetivo</dt><dd>Familiares y amigos que buscan un regalo con significado: padres y abuelos de niños de 0 a 10 años, y también jóvenes y adultos que quieren sorprender a su pareja o a un amigo en cumpleaños, aniversarios, graduaciones o San Valentín.</dd>
+<dt>Propuesta de valor</dt><dd>Un peluche que es único porque lo diseñas tú. No regalas un objeto cualquiera: regalas un compañero con nombre, estilo y un mensaje propio, que se vuelve un recuerdo.</dd>
+<dt>Frase de marca</dt><dd>“Un abrazo que puedes personalizar.”</dd></dl></section>
+<!-- Explicación y ejemplos del logotipo de la marca. -->
+<section><h2>Logotipo</h2>
+<p>El logo es la cara de un osito de peluche con mejillas sonrojadas y orejas de dos colores. Usa formas redondas y sin esquinas para transmitir suavidad y ternura, justo lo que se siente al abrazar un peluche. Los detalles azules dentro de las orejas hacen que se vea distinto de un osito genérico y se ve bien sobre fondos claros, rosas y oscuros.</p>
+<div class="logo-row"><svg width="120" height="120" aria-label="Logotipo sobre fondo claro" role="img"><use href="#logo"/></svg><svg class="pk" width="120" height="120" aria-label="Logotipo sobre fondo rosa" role="img"><use href="#logo"/></svg><svg class="dk" width="120" height="120" aria-label="Logotipo sobre fondo oscuro" role="img"><use href="#logo"/></svg></div></section>
+<!-- Colores utilizados para representar la identidad visual (rejilla de Bootstrap). -->
+<section><h2>Paleta de colores</h2>
+<div class="row row-cols-1 row-cols-md-2 g-3">
+<div class="col"><div class="swatch"><span class="chip" style="background:#F7A8B8"></span><div><strong>Rosa algodón</strong> <code>#F7A8B8</code><p>Representa ternura, cariño y dulzura. Es el color principal de la marca y evoca el afecto de un abrazo.</p></div></div></div>
+<div class="col"><div class="swatch"><span class="chip" style="background:#5A3A31"></span><div><strong>Café cacao</strong> <code>#5A3A31</code><p>Transmite calidez, cercanía y confianza, y recuerda al pelaje de un osito. Se usa en textos y contornos porque se lee bien sobre colores claros.</p></div></div></div>
+<div class="col"><div class="swatch"><span class="chip" style="background:#8EC5E8"></span><div><strong>Azul cielo</strong> <code>#8EC5E8</code><p>Se asocia con calma, seguridad e infancia. Equilibra la dulzura del rosa y da un acento fresco y diferente.</p></div></div></div>
+<div class="col"><div class="swatch"><span class="chip" style="background:#FFF3F6"></span><div><strong>Blanco rosado</strong> <code>#FFF3F6</code><p>Fondo muy suave que da sensación de pureza y limpieza, y deja respirar el contenido.</p></div></div></div></div>
+<p class="mt-3">En el modo oscuro el fondo pasa a un café muy profundo y el texto a un rosa pálido. El rosa y el azul se mantienen iguales para que la marca se reconozca en los dos modos.</p></section>
+</div></section>
+
+<!-- Página educativa sobre JavaScript y sus conceptos básicos. -->
+<section class="vista page" id="javascript"><div class="wrap">
+<div class="page-head"><div><h1>JavaScript (JS vanilla)</h1></div><img class="banner-bear" data-oso="panda" alt="" width="144" height="173"></div>
+<p class="lead">JavaScript es el lenguaje de programación de los navegadores. Se usa en el desarrollo web para que una página reaccione a lo que hace la persona: clics, teclas, formularios y datos que llegan de un servidor. "Vanilla" significa JavaScript puro, sin librerías. En CuddleMe, por ejemplo, es lo que hace que el peluche de la página de inicio cambie de color mientras eliges.</p>
+
+<h2>HTML, CSS y JS: tres capas</h2>
+<p>Una página web se construye con tres lenguajes que se complementan. Piensa en un peluche: el HTML es el cuerpo, el CSS es el color y la ropita, y el JavaScript es lo que lo hace "hablar" cuando lo abrazas.</p>
+<div class="scroll"><table><thead><tr><th>Lenguaje</th><th>Papel</th><th>Ejemplo en CuddleMe</th></tr></thead><tbody>
+<tr><td>HTML</td><td>Estructura: qué contenido hay</td><td>El título, los campos de nombre y mensaje, la imagen del peluche</td></tr>
+<tr><td>CSS</td><td>Estilo: cómo se ve</td><td>El rosa de la marca, la tipografía redondeada, los espacios</td></tr>
+<tr><td>JS</td><td>Comportamiento: qué hace</td><td>El peluche cambia de color o de accesorio al elegir una opción</td></tr></tbody></table></div>
+
+<h2>Conceptos básicos</h2>
+<ul>
+<li><strong>Variables:</strong> guardan datos para usarlos después. Se declaran con <code>let</code> (el valor puede cambiar) o <code>const</code> (no se vuelve a asignar).</li>
+<li><strong>Funciones:</strong> bloques de código con nombre que se ejecutan cuando se necesitan.</li>
+<li><strong>Eventos:</strong> cosas que ocurren en la página, como <code>click</code> (hacer clic) o <code>mouseover</code> (pasar el cursor, también llamado hover). Con <code>addEventListener</code> se conecta una función a un evento.</li></ul>
+
+<h2>Ejemplo práctico</h2>
+<p>El siguiente código usa una variable, una función y dos eventos. Pruébalo con el botón: haz clic para dar abrazos y pasa el cursor por encima para ver cómo cambia el color.</p>
+<pre><code>/* ==================== EJEMPLO DE JAVASCRIPT ==================== */
+// Obtiene los elementos del botón y del texto que muestra el número de abrazos.
+const boton = document.getElementById('btn-abrazo');
+const salida = document.getElementById('salida-abrazo');
+let abrazos = 0;                      // variable
+
+// Aumenta en uno el contador de abrazos y actualiza el texto en pantalla.
+function darAbrazo() {                // función
+  abrazos = abrazos + 1;
+  salida.textContent = 'Abrazos: ' + abrazos;
+}
+
+// Ejecuta la función cuando el usuario hace clic en el botón.
+boton.addEventListener('click', darAbrazo);                                   // evento click
+boton.addEventListener('mouseover', () =&gt; boton.style.background = '#8EC5E8'); // evento hover
+boton.addEventListener('mouseout',  () =&gt; boton.style.background = '');</code></pre>
+<div class="demo"><button id="btn-abrazo" class="btn btn-cuddle">Dar un abrazo</button> <span id="salida-abrazo" aria-live="polite">Abrazos: 0</span></div>
+
+<h3>Cómo se lee, paso a paso</h3>
+<ol>
+<li>Con <code>getElementById</code> se buscan en el HTML el botón y el texto donde se mostrará el resultado.</li>
+<li>La variable <code>abrazos</code> empieza en 0.</li>
+<li>La función <code>darAbrazo</code> suma 1 a la variable y actualiza el texto en pantalla.</li>
+<li>Los eventos conectan el botón con las funciones: el clic llama a <code>darAbrazo</code> y el cursor cambia el color del botón.</li></ol>
+
+<section class="bib"><h2>Recursos y bibliografía</h2><ul>
+<li><a href="https://developer.mozilla.org/es/docs/Web/JavaScript">MDN Web Docs: JavaScript</a></li>
+<li><a href="https://developer.mozilla.org/es/docs/Web/Events">MDN Web Docs: Eventos</a></li>
+<li><a href="https://www.w3schools.com/js/">W3Schools: JavaScript Tutorial</a></li></ul></section>
+</div></section>
+
+<!-- Página educativa sobre la librería jQuery. -->
+<section class="vista page" id="jquery"><div class="wrap">
+<div class="page-head"><div><h1>jQuery</h1></div><img class="banner-bear" data-oso="polar" alt="" width="144" height="173"></div>
+<p class="lead">jQuery es una librería de JavaScript lanzada en 2006. Nació porque los navegadores de esa época interpretaban el JavaScript de formas distintas, y escribir código que funcionara en todos era difícil. jQuery ofrecía una manera corta y uniforme de hacerlo, con el lema de escribir menos y hacer más.</p>
+<h2>Sintaxis básica</h2>
+<p>El símbolo <code>$</code> es la función principal de jQuery. El patrón siempre es el mismo: seleccionar un elemento y aplicarle una acción.</p>
+<pre><code>$(&#x27;selector&#x27;).accion();
+
+$(&#x27;#mensaje&#x27;).text(&#x27;Te quiero mucho&#x27;);   // selecciona por id y cambia el texto
+$(&#x27;.tarjeta&#x27;).hide();                   // selecciona por clase y oculta</code></pre>
+<p>Para usarla hay que cargar el archivo de jQuery antes de tu código, por ejemplo desde un CDN:</p>
+<pre><code>&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js&quot;&gt;&lt;/script&gt;</code></pre>
+<h2>Ventajas y desventajas frente a JavaScript moderno</h2>
+<div class="two"><div><h3>Ventajas</h3><ul><li>Sintaxis corta y fácil de leer.</li><li>Efectos y animaciones listos para usar.</li><li>Hay mucho código y plugins existentes, por eso aún aparece en proyectos antiguos.</li></ul></div>
+<div><h3>Desventajas</h3><ul><li>Es una descarga extra que hace la página más pesada.</li><li>Casi todo lo que resolvía ya existe en JavaScript moderno (<code>querySelector</code>, <code>classList</code>, <code>fetch</code>).</li><li>Los frameworks actuales usan otro enfoque y no dependen de jQuery.</li></ul></div></div>
+<h2>Comparación: JS vanilla y jQuery</h2>
+<p>La misma tarea escrita de las dos formas, lado a lado:</p>
+<div class="scroll"><table><thead><tr><th>Tarea</th><th>JS vanilla</th><th>jQuery</th></tr></thead><tbody><tr><td>Seleccionar un elemento</td><td><code>const t = document.querySelector(&#x27;#nombre-peluche&#x27;);</code></td><td><code>const t = $(&#x27;#nombre-peluche&#x27;);</code></td></tr><tr><td>Escuchar un clic</td><td><code>btn.addEventListener(&#x27;click&#x27;, f);</code></td><td><code>$(&#x27;#btn&#x27;).on(&#x27;click&#x27;, f);</code></td></tr><tr><td>Ocultar un elemento</td><td><code>caja.style.display = &#x27;none&#x27;;</code></td><td><code>$(&#x27;#caja&#x27;).hide();</code></td></tr><tr><td>Agregar una clase</td><td><code>caja.classList.add(&#x27;destacado&#x27;);</code></td><td><code>$(&#x27;#caja&#x27;).addClass(&#x27;destacado&#x27;);</code></td></tr><tr><td>Cambiar el texto</td><td><code>t.textContent = &#x27;Osito&#x27;;</code></td><td><code>$(&#x27;#nombre-peluche&#x27;).text(&#x27;Osito&#x27;);</code></td></tr></tbody></table></div>
+<h2>Efectos típicos</h2>
+<p>Dos efectos clásicos de jQuery: <code>fadeIn</code> (aparecer poco a poco) y <code>slideToggle</code> (abrir y cerrar deslizando). Pruébalos:</p>
+<pre><code>$(&#x27;#btn-fade&#x27;).on(&#x27;click&#x27;, function () {
+  $(&#x27;#caja&#x27;).hide().fadeIn(600);        // el mensaje aparece suavemente
+});
+$(&#x27;#btn-slide&#x27;).on(&#x27;click&#x27;, function () {
+  $(&#x27;#panel&#x27;).slideToggle(400);         // la lista se desliza abierta o cerrada
+});</code></pre>
+<div class="demo"><button id="btn-fade" class="btn btn-cuddle">fadeIn: ver mensaje</button> <button id="btn-slide" class="btn btn-cuddle">slideToggle: ver accesorios</button>
+<div id="caja" class="box">💌 “Un abrazo que puedes personalizar.”</div>
+<div id="panel" class="box alt"><strong>Accesorios disponibles:</strong> lazo, gorro de fiesta, corona, bufanda y lentes.</div></div>
+<section class="bib"><h2>Recursos y bibliografía</h2><ul><li><a href="https://api.jquery.com/">jQuery API Documentation</a></li><li><a href="https://jquery.com/">jQuery: sitio oficial</a></li><li><a href="https://www.w3schools.com/jquery/">W3Schools: jQuery Tutorial</a></li></ul></section></div></section>
+
+<!-- Página educativa sobre el formato de datos JSON. -->
+<section class="vista page" id="json"><div class="wrap">
+<div class="page-head"><div><h1>JSON</h1></div><img class="banner-bear" data-oso="lazo" alt="" width="144" height="173"></div>
+<p class="lead">JSON (JavaScript Object Notation) es un formato de texto para representar datos. Es ligero, fácil de leer para una persona y fácil de procesar para casi cualquier lenguaje de programación. Por eso es el estándar para intercambiar datos entre aplicaciones y servidores: un peluche de CuddleMe, con su nombre, color y mensaje, puede viajar como JSON del formulario a la fábrica.</p>
+<h2>Estructura básica</h2>
+<ul><li><strong>Objeto:</strong> conjunto de pares clave-valor entre llaves <code>{ }</code>.</li><li><strong>Arreglo:</strong> lista ordenada de valores entre corchetes <code>[ ]</code>.</li><li><strong>Valores permitidos:</strong> texto, número, <code>true</code> o <code>false</code>, <code>null</code>, objetos y arreglos.</li><li><strong>Regla clave:</strong> las claves y los textos siempre van entre comillas dobles.</li></ul>
+<h2>Objeto de JavaScript y cadena JSON</h2>
+<p>Se parecen mucho, pero son cosas distintas: el objeto vive dentro del programa, y la cadena JSON es texto que se puede guardar o enviar.</p>
+<div class="two"><div><h3>Objeto JS</h3><pre><code>const peluche = {
+  nombre: &quot;Osito&quot;,
+  color: &quot;rosa&quot;,
+  accesorios: [&quot;lazo&quot;, &quot;gorro&quot;],
+  ropita: &quot;camiseta&quot;,
+  mensaje: &quot;Te quiero mucho&quot;,
+  personalizado: true
+};</code></pre></div><div><h3>Cadena JSON</h3><pre><code>{
+  &quot;nombre&quot;: &quot;Osito&quot;,
+  &quot;color&quot;: &quot;rosa&quot;,
+  &quot;accesorios&quot;: [&quot;lazo&quot;, &quot;gorro&quot;],
+  &quot;ropita&quot;: &quot;camiseta&quot;,
+  &quot;mensaje&quot;: &quot;Te quiero mucho&quot;,
+  &quot;personalizado&quot;: true
+}</code></pre></div></div>
+<div class="scroll"><table><thead><tr><th>Diferencia</th><th>Objeto JS</th><th>JSON</th></tr></thead><tbody><tr><td>Claves</td><td>Con o sin comillas</td><td>Siempre con comillas dobles</td></tr><tr><td>Comillas simples</td><td>Permitidas</td><td>No permitidas</td></tr><tr><td>Funciones y comentarios</td><td>Permitidos</td><td>No permitidos</td></tr></tbody></table></div>
+<p>Dos métodos convierten entre ambos: <code>JSON.stringify(objeto)</code> crea la cadena y <code>JSON.parse(cadena)</code> vuelve a crear el objeto.</p>
+<h2>Pruébalo</h2>
+<pre><code>const texto = document.getElementById(&#x27;entrada&#x27;).value;
+try {
+  const objeto = JSON.parse(texto);   // Convierte el texto JSON en un objeto JavaScript.   // cadena JSON -&gt; objeto JS
+  salida.textContent = &#x27;Válido. El peluche se llama &#x27; + objeto.nombre;
+} catch (error) {
+  salida.textContent = &#x27;JSON inválido: &#x27; + error.message;
+}</code></pre>
+<div class="demo"><div style="flex-basis:100%"><label for="entrada"><strong>Edita el JSON y pulsa el botón:</strong></label>
+<textarea id="entrada" class="form-control" rows="8">{
+  &quot;nombre&quot;: &quot;Osito&quot;,
+  &quot;color&quot;: &quot;rosa&quot;,
+  &quot;accesorios&quot;: [&quot;lazo&quot;, &quot;gorro&quot;],
+  &quot;ropita&quot;: &quot;camiseta&quot;,
+  &quot;mensaje&quot;: &quot;Te quiero mucho&quot;,
+  &quot;personalizado&quot;: true
+}</textarea></div>
+<button id="btn-json" class="btn btn-cuddle">Convertir con JSON.parse</button> <span id="salida" aria-live="polite"></span></div>
+<h2>Cómo lo usan las aplicaciones web</h2>
+<p>Cuando una página necesita datos (por ejemplo, el estado de un pedido), el navegador envía una petición a un servidor o a una API. El servidor responde con texto en formato JSON, y el código de la página lo convierte en objetos para mostrarlo en pantalla. También funciona al revés: al enviar el formulario de personalización, la página manda los datos del peluche como JSON.</p>
+<pre><code>fetch(&#x27;https://api.ejemplo.com/pedidos/1&#x27;)
+  .then(respuesta =&gt; respuesta.json())      // lee la respuesta como JSON
+  .then(datos =&gt; console.log(datos.peluche.nombre));</code></pre><section class="bib"><h2>Recursos y bibliografía</h2><ul><li><a href="https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/JSON">MDN: JSON</a></li><li><a href="https://www.json.org/json-es.html">JSON.org (especificación)</a></li><li><a href="https://www.w3schools.com/js/js_json_intro.asp">W3Schools: JSON Tutorial</a></li></ul></section></div></section>
+
+<!-- Página educativa sobre hosting, dominios y DNS. -->
+<section class="vista page" id="hosting"><div class="wrap">
+<div class="page-head"><div><h1>Web hosting y dominios</h1></div><img class="banner-bear" data-oso="corona" alt="" width="144" height="173"></div>
+<p class="lead">Una página web es un conjunto de archivos. Para que otras personas la vean, esos archivos deben estar en un servidor conectado a internet (hosting), y alguien debe poder encontrarlos con un nombre fácil de recordar (dominio).</p>
+<h2>Web hosting</h2>
+<p>El hosting es el servicio que guarda tus archivos en un servidor que está encendido todo el tiempo y los entrega a quien los pida.</p>
+<div class="scroll"><table><thead><tr><th>Tipo</th><th>Cómo funciona</th><th>Útil para</th></tr></thead><tbody>
+<tr><td>Compartido</td><td>Varios sitios comparten un mismo servidor</td><td>Sitios pequeños con poco tráfico y presupuesto bajo</td></tr>
+<tr><td>VPS</td><td>Una parte reservada de un servidor, con control sobre el sistema</td><td>Proyectos que necesitan configuración propia</td></tr>
+<tr><td>Nube</td><td>Recursos repartidos en muchos servidores que crecen según la demanda</td><td>Sitios con tráfico variable o que deben escalar</td></tr></tbody></table></div>
+<h3>Cómo funciona Vercel para sitios estáticos</h3>
+<p>Un sitio estático son archivos HTML, CSS y JS que no necesitan procesarse en el servidor, como este. Vercel es una plataforma en la nube pensada para publicarlos:</p>
+<ol><li>Conectas tu repositorio de GitHub a Vercel.</li><li>Vercel toma los archivos y los publica en su red de servidores repartidos por el mundo (CDN), así la página carga desde un lugar cercano.</li><li>Te da una URL pública con el formato <code>nombre-proyecto.vercel.app</code> y HTTPS incluido.</li><li>Cada vez que haces <code>git push</code>, Vercel vuelve a desplegar el sitio automáticamente.</li></ol>
+<h2>Dominios</h2>
+<p>Un <strong>nombre de dominio</strong> es la dirección legible de un sitio (como <code>cuddleme.com</code>). Reemplaza a la dirección IP, que es un número difícil de recordar. Se compra por año a un registrador.</p>
+<div class="anat" aria-label="tienda.cuddleme.com dividido en subdominio, dominio y TLD"><span class="p sub">tienda</span>.<span class="p dom">cuddleme</span>.<span class="p tld">com</span></div>
+<ul><li><strong>TLD (dominio de nivel superior):</strong> el final del dominio, como <code>.com</code> (comercial), <code>.net</code> (redes) o <code>.org</code> (organizaciones).</li><li><strong>Dominio:</strong> el nombre que eliges, junto a su TLD.</li><li><strong>Subdominio:</strong> una sección antes del dominio, como <code>tienda</code> en <code>tienda.cuddleme.com</code>, que sirve para separar partes del sitio.</li></ul>
+<h2>Propagación DNS</h2>
+<p>El DNS es la "guía telefónica" de internet: traduce dominios a direcciones IP. Así ocurre una consulta:</p>
+<ol class="flow"><li>Escribes <code>tienda.cuddleme.com</code> en el navegador.</li><li>El navegador y el sistema operativo buscan la IP en su memoria (caché). Si no la tienen, preguntan al resolver DNS de tu proveedor de internet.</li><li>El resolver consulta a un servidor raíz, que lo envía al servidor del TLD (<code>.com</code>).</li><li>El servidor del TLD indica cuál es el servidor DNS autoritativo del dominio, que guarda los registros reales.</li><li>El servidor autoritativo responde con la dirección IP del hosting.</li><li>El navegador se conecta a esa IP y recibe la página. La respuesta queda en caché por un tiempo.</li></ol>
+<p>Cuando cambias un registro DNS (por ejemplo, apuntar tu dominio a Vercel), los servidores del mundo no se enteran al instante: cada uno guarda la respuesta anterior hasta que vence su TTL (tiempo de vida). A ese reparto gradual se le llama <strong>propagación</strong> y puede tardar desde minutos hasta 48 horas.</p>
+<section class="bib"><h2>Recursos y bibliografía</h2><ul><li><a href="https://vercel.com/docs">Vercel Docs</a></li><li><a href="https://developer.mozilla.org/es/docs/Glossary/DNS">MDN: DNS (glosario)</a></li><li><a href="https://developer.mozilla.org/es/docs/Glossary/TLD">MDN: TLD (glosario)</a></li><li><a href="https://www.w3schools.com/whatis/whatis_hosting.asp">W3Schools: Web Hosting</a></li></ul></section></div></section>
+
+<!-- NUEVA página: 15 herramientas de IA de Google con nivel gratuito. Las tarjetas se generan con JavaScript. -->
+<section class="vista page" id="ia"><div class="wrap">
+<div class="page-head"><div><h1>15 IA de Google</h1></div><img class="banner-bear" data-oso="gatito" alt="" width="144" height="173"></div>
+<p class="lead">Google ofrece herramientas de inteligencia artificial que puedes probar sin pagar con una cuenta personal. Aquí están 15, agrupadas por lo que te ayudan a hacer. Pulsa "Cómo se usa" en cada una para ver los pasos y una idea aplicada a CuddleMe.</p>
+<h2>Cómo elegimos las herramientas</h2>
+<ul>
+<li><strong>Nivel gratuito real:</strong> todas se pueden empezar a usar sin tarjeta, aunque con límites diarios o de uso.</li>
+<li><strong>Utilidad para el proyecto:</strong> cada una tiene una idea concreta para una tienda de peluches personalizados.</li>
+<li><strong>Variedad:</strong> hay herramientas para estudiar, para crear contenido y para programar, porque un sitio web necesita las tres cosas.</li></ul>
+<div class="filtros" role="group" aria-label="Filtrar herramientas">
+  <button type="button" class="btn btn-cuddle btn-sm" data-filtro="todas" aria-pressed="true">Todas</button>
+  <button type="button" class="btn btn-cuddle btn-sm" data-filtro="Estudio" aria-pressed="false">Estudio</button>
+  <button type="button" class="btn btn-cuddle btn-sm" data-filtro="Creatividad" aria-pressed="false">Creatividad</button>
+  <button type="button" class="btn btn-cuddle btn-sm" data-filtro="Desarrollo" aria-pressed="false">Desarrollo</button>
+  <label class="visually-hidden" for="buscar">Buscar herramienta</label>
+  <input id="buscar" class="form-control form-control-sm" type="search" placeholder="Buscar herramienta">
+</div>
+<p id="conteo" aria-live="polite" class="fw-bold"></p>
+<div id="herramientas" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4"></div>
+<p id="vacio" class="nota-pie" hidden>No hay herramientas con ese nombre. Borra la búsqueda o elige otra categoría.</p>
+<div class="nota-pie"><strong>Antes de usarlas:</strong> los límites gratuitos y los países disponibles cambian con frecuencia, y varias herramientas de Google Labs son experimentos. Revisa el enlace oficial de cada una. Dejamos fuera Whisk, porque según lo investigado Google movió sus funciones a Flow en 2026.</div>
+<section class="bib"><h2>Recursos y bibliografía</h2><ul>
+<li><a href="https://labs.google/">Google Labs</a></li>
+<li><a href="https://blog.google/products-and-platforms/products/education/back-to-school-2026/">Google: Back to School 2026</a></li>
+<li><a href="https://aistudio.google.com/">Google AI Studio</a></li></ul></section>
+</div></section>
+
+<!-- Cuestionario interactivo para evaluar los conocimientos del sitio. -->
+<section class="vista page" id="cuestionario"><div class="wrap"><h1 class="mt-4">Cuestionario web</h1>
+<p class="lead">Doce preguntas basadas en las páginas de este sitio. Elige una respuesta en cada una para ver al instante si es correcta. Si te equivocas, lee la explicación y repasa la página correspondiente.</p>
+<div id="quiz"></div><div id="resultado" class="result" aria-live="polite" hidden></div>
+<button id="reiniciar" class="btn btn-cuddle" hidden>Intentar de nuevo</button></div></section>
+
+<!-- Formulario de contacto para comunicación con clientes. Cambia TU_CORREO por el correo del negocio. -->
+<section class="vista page" id="contacto"><div class="wrap">
+  <div class="page-head"><div><h1>Contacto</h1><p class="lead">¿Tienes una pregunta sobre tu peluche personalizado? Escríbenos y nos pondremos en contacto contigo.</p></div><img class="banner-bear" data-oso="clasico" alt="Osito de CuddleMe" width="144" height="173"></div>
+  <div class="row justify-content-center"><div class="col-lg-8">
+    <div class="card p-3 p-md-4 shadow-sm" style="background:var(--surface);border:2px solid var(--line);border-radius:18px">
+      <form action="https://formsubmit.co/TU_CORREO@example.com" method="POST">
+        <input type="hidden" name="_subject" value="Nuevo mensaje de cliente - CuddleMe">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_captcha" value="false">
+        <div class="mb-3"><label class="form-label" for="cliente-nombre">Nombre completo *</label><input class="form-control" id="cliente-nombre" name="nombre" type="text" autocomplete="name" required maxlength="100" placeholder="Escribe tu nombre"></div>
+        <div class="row"><div class="col-md-6 mb-3"><label class="form-label" for="cliente-email">Correo electrónico *</label><input class="form-control" id="cliente-email" name="email" type="email" autocomplete="email" required maxlength="150" placeholder="tucorreo@ejemplo.com"></div>
+        <div class="col-md-6 mb-3"><label class="form-label" for="cliente-telefono">Teléfono (opcional)</label><input class="form-control" id="cliente-telefono" name="telefono" type="tel" autocomplete="tel" maxlength="30" placeholder="Tu número de contacto"></div></div>
+        <div class="mb-3"><label class="form-label" for="cliente-tema">Motivo de contacto *</label><select class="form-select" id="cliente-tema" name="motivo" required><option value="" selected disabled>Selecciona una opción</option><option>Consulta sobre productos</option><option>Personalización de peluche</option><option>Pedido o entrega</option><option>Precio y disponibilidad</option><option>Queja o sugerencia</option><option>Otro</option></select></div>
+        <div class="mb-3"><label class="form-label" for="cliente-mensaje">Mensaje *</label><textarea class="form-control" id="cliente-mensaje" name="mensaje" rows="5" required minlength="10" maxlength="2000" placeholder="Cuéntanos cómo podemos ayudarte..."></textarea><div class="form-text">Escribe al menos 10 caracteres para explicar tu consulta.</div></div>
+        <button class="btn btn-cuddle" type="submit">Enviar mensaje ✉️</button>
+        <p class="mt-3 mb-0 small">Los campos con * son obligatorios. Usaremos tus datos únicamente para responder a tu consulta.</p>
+      </form>
+    </div>
+  </div></div>
+</div></section></main>
+
+<!-- Ventana modal de Bootstrap: muestra el detalle de la herramienta elegida. -->
+<div class="modal fade" id="modalIA" tabindex="-1" aria-labelledby="modalTitulo" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+    <div class="modal-content">
+      <div class="modal-header"><h2 class="modal-title" id="modalTitulo"></h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button></div>
+      <div class="modal-body" id="modalCuerpo"></div>
+      <div class="modal-footer"><a id="modalLink" class="btn btn-cuddle" href="#" target="_blank" rel="noopener">Abrir herramienta</a><button type="button" class="btn btn-cuddle" data-bs-dismiss="modal">Cerrar</button></div>
+    </div>
+  </div>
+</div>
+
+<button id="subir" class="subir" type="button" aria-label="Volver arriba">↑</button>
+
+<!-- Pie de página con información del proyecto académico. -->
+<footer><p>CuddleMe es una marca creada para un proyecto académico de desarrollo web.</p></footer>
+
+<!-- Bootstrap JS (carrusel, menú plegable y modal). -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ==================== IDIOMA (ES / EN) ==================== */
+// Idioma activo: se recuerda en localStorage; por defecto, español.
+var LANG = 'es';
+try { LANG = localStorage.getItem('cuddle-lang') === 'en' ? 'en' : 'es'; } catch (e) {}
+// L(es, en) devuelve el texto en el idioma activo; T(texto) traduce etiquetas del personalizador.
+function L(es, en) { return LANG === 'en' ? en : es; }
+const EN_DYN = {"Tipo de oso":"Bear type","Color":"Color","Orejas":"Ears","Patitas":"Paws","En la cabeza":"On the head","Ropita":"Outfit","Extras":"Extras","Lentes":"Glasses","Bufanda":"Scarf","Clásico":"Classic","Panda":"Panda","Polar":"Polar","Dorado":"Golden","Marrón":"Brown","Blanco":"White","Rosa":"Pink","Azul":"Blue","Lila":"Lilac","Redondas":"Round","Grandes":"Big","Pequeñas":"Small","De gatito":"Kitten","Normales":"Regular","Con almohadillas":"With paw pads","Con zapatitos":"With booties","Nada":"None","Lazo":"Bow","Gorro de fiesta":"Party hat","Corona":"Crown","Sin ropa":"No clothes","Camiseta":"T-shirt"};
+function T(s) { return LANG === 'en' && EN_DYN[s] ? EN_DYN[s] : s; }
+
+/* ==================== CONFIGURACIÓN DEL PERSONALIZADOR ==================== */
+// Tipos de osos disponibles y sus características visuales.
+const TIPOS = {
+  clasico: { n: 'Clásico', color: '#B07A4F', hocico: '#F4DDBF' },
+  panda:   { n: 'Panda',   color: '#FFFFFF', hocico: '#FFFFFF' },
+  polar:   { n: 'Polar',   color: '#FFFFFF', hocico: '#EAF2F8' },
+  miel:    { n: 'Dorado',  color: '#E8B04A', hocico: '#FBE7B5' }
+};
+// Colores que el usuario puede seleccionar para personalizar el peluche.
+const COLORES = [['#B07A4F', 'Marrón'], ['#FFFFFF', 'Blanco'], ['#E8B04A', 'Dorado'], ['#F7A8B8', 'Rosa'], ['#8EC5E8', 'Azul'], ['#C9B6E8', 'Lila']];
+// Formas de orejas disponibles.
+const OREJAS = [['redondas', 'Redondas'], ['grandes', 'Grandes'], ['pequenas', 'Pequeñas'], ['gatito', 'De gatito']];
+// Tipos de patitas disponibles.
+const PATITAS = [['normales', 'Normales'], ['grandes', 'Grandes'], ['almohadillas', 'Con almohadillas'], ['zapatitos', 'Con zapatitos']];
+// Accesorios que se pueden colocar en la cabeza.
+const CABEZA = [['', 'Nada'], ['lazo', 'Lazo'], ['gorro', 'Gorro de fiesta'], ['corona', 'Corona']];
+// Opciones de ropa para el peluche.
+const ROPA = [['', 'Sin ropa'], ['camiseta', 'Camiseta']];
+// Estado inicial del personalizador.
+const INICIO = { tipo: 'clasico', color: '#B07A4F', orejas: 'redondas', patitas: 'normales', cabeza: '', ropa: '', lentes: false, bufanda: false };
+// Peluches prediseñados que se usan como imágenes en el carrusel y en los encabezados.
+const PRESETS = {
+  lazo:   { tipo: 'clasico', color: '#B07A4F', orejas: 'redondas', patitas: 'almohadillas', cabeza: 'lazo',   ropa: '',         lentes: false, bufanda: false },
+  panda:  { tipo: 'panda',   color: '#FFFFFF', orejas: 'redondas', patitas: 'almohadillas', cabeza: '',       ropa: '',         lentes: true,  bufanda: false },
+  polar:  { tipo: 'polar',   color: '#FFFFFF', orejas: 'pequenas', patitas: 'zapatitos',    cabeza: '',       ropa: '',         lentes: false, bufanda: true  },
+  corona: { tipo: 'miel',    color: '#E8B04A', orejas: 'grandes',  patitas: 'normales',     cabeza: 'corona', ropa: 'camiseta', lentes: false, bufanda: false },
+  gorro:  { tipo: 'clasico', color: '#F7A8B8', orejas: 'redondas', patitas: 'grandes',      cabeza: 'gorro',  ropa: 'camiseta', lentes: false, bufanda: false },
+  gatito: { tipo: 'clasico', color: '#C9B6E8', orejas: 'gatito',   patitas: 'normales',     cabeza: '',       ropa: '',         lentes: true,  bufanda: false },
+  clasico:{ tipo: 'clasico', color: '#B07A4F', orejas: 'redondas', patitas: 'almohadillas', cabeza: '',       ropa: '',         lentes: false, bufanda: false }
+};
+let estado = Object.assign({}, INICIO); // Copia el estado inicial para poder modificarlo.
+const ctrl = document.getElementById('ctrl'), escena = document.getElementById('escena');
+const nombreIn = document.getElementById('nombre'), msgIn = document.getElementById('msg');
+
+// Crea grupos de opciones para que el usuario pueda personalizar el peluche.
+function grupo(titulo, clave, lista, esColor) {
+  const items = lista.map(function (o) {
+    const marca = estado[clave] === o[0] ? ' checked' : '';
+    const input = '<input type="radio" name="' + clave + '" value="' + o[0] + '"' + marca + '>';
+    return esColor
+      ? '<label>' + input + '<span class="cs" style="background:' + o[0] + '" title="' + T(o[1]) + '"></span><span class="ver">' + T(o[1]) + '</span></label>'
+      : '<label>' + input + '<span class="t">' + T(o[1]) + '</span></label>';
+  }).join('');
+  return '<fieldset class="g"><legend>' + T(titulo) + '</legend><div class="chips">' + items + '</div></fieldset>';
+}
+
+// Construye dinámicamente los controles del personalizador dentro del HTML.
+function construir() {
+  ctrl.innerHTML =
+    grupo('Tipo de oso', 'tipo', Object.keys(TIPOS).map(function (k) { return [k, TIPOS[k].n]; })) +
+    grupo('Color', 'color', COLORES, true) +
+    grupo('Orejas', 'orejas', OREJAS) +
+    grupo('Patitas', 'patitas', PATITAS) +
+    grupo('En la cabeza', 'cabeza', CABEZA) +
+    grupo('Ropita', 'ropa', ROPA) +
+    '<fieldset class="g"><legend>' + T('Extras') + '</legend><div class="chips">' +
+    '<label><input type="checkbox" name="lentes"' + (estado.lentes ? ' checked' : '') + '><span class="t">' + T('Lentes') + '</span></label>' +
+    '<label><input type="checkbox" name="bufanda"' + (estado.bufanda ? ' checked' : '') + '><span class="t">' + T('Bufanda') + '</span></label></div></fieldset>';
+}
+
+// Dibuja las almohadillas de las patas mediante elementos SVG.
+function pad(x, y) {
+  const r = '#F28FA6';
+  return '<ellipse cx="' + x + '" cy="' + (y + 3) + '" rx="9" ry="7" fill="' + r + '"/>' +
+    '<circle cx="' + (x - 9) + '" cy="' + (y - 6) + '" r="3.5" fill="' + r + '"/><circle cx="' + x + '" cy="' + (y - 9) + '" r="3.5" fill="' + r + '"/><circle cx="' + (x + 9) + '" cy="' + (y - 6) + '" r="3.5" fill="' + r + '"/>';
+}
+
+// Genera las formas SVG del peluche según un estado (se reutiliza en el personalizador, el carrusel y los encabezados).
+function cuerpoSVG(e) {
+  const t = TIPOS[e.tipo], K = '#5A3A31', D = '#2B2B2B', panda = e.tipo === 'panda';
+  const acc = e.color === '#8EC5E8' ? '#F7A8B8' : '#8EC5E8';
+  const trazo = ' stroke="' + K + '" stroke-width="3" stroke-linejoin="round"';
+  const piel = 'fill="' + e.color + '"' + trazo;
+  const marca = panda ? 'fill="' + D + '"' + trazo : piel;
+  const grandes = e.patitas === 'grandes', fr = grandes ? 28 : 22, fy = grandes ? 20 : 16;
+  let s = '';
+
+  [62, 138].forEach(function (x) {                       // patitas de abajo
+    s += '<ellipse ' + marca + ' cx="' + x + '" cy="212" rx="' + fr + '" ry="' + fy + '"/>';
+    if (e.patitas === 'zapatitos') s += '<ellipse fill="' + acc + '"' + trazo + ' cx="' + x + '" cy="212" rx="' + (fr + 3) + '" ry="' + (fy + 2) + '"/><circle cx="' + x + '" cy="203" r="4" fill="#fff"/>';
+    if (e.patitas === 'almohadillas') s += pad(x, 212);
+  });
+  const ar = grandes ? [20, 34] : [16, 30];              // brazos
+  s += '<ellipse ' + marca + ' cx="46" cy="150" rx="' + ar[0] + '" ry="' + ar[1] + '" transform="rotate(20 46 150)"/>' +
+       '<ellipse ' + marca + ' cx="154" cy="150" rx="' + ar[0] + '" ry="' + ar[1] + '" transform="rotate(-20 154 150)"/>';
+  s += '<circle ' + piel + ' cx="100" cy="164" r="52"/>';  // cuerpo
+
+  if (e.ropa === 'camiseta') s += '<path d="M62 134Q100 148 138 134L148 190Q100 216 52 190Z" fill="#fff"' + trazo + '/><path d="M100 188c-14-10-18-20-9-25 5-3 9 0 9 4 0-4 4-7 9-4 9 5 5 15-9 25z" fill="#F7A8B8"' + trazo + '/>';
+  if (e.bufanda) s += '<path d="M60 128Q100 148 140 128L144 146Q100 166 56 146Z" fill="' + acc + '"' + trazo + '/><path d="M120 150L130 190L148 184L140 142Z" fill="' + acc + '"' + trazo + '/>';
+
+  if (e.orejas === 'gatito') {                           // orejas
+    s += '<path ' + marca + ' d="M44 64L54 12L90 46Z"/><path ' + marca + ' d="M156 64L146 12L110 46Z"/>';
+    if (!panda) s += '<path d="M54 54L58 28L78 46Z" fill="#8EC5E8"/><path d="M146 54L142 28L122 46Z" fill="#8EC5E8"/>';
+  } else {
+    const o = { redondas: [17, 62, 48, 138], grandes: [24, 58, 46, 142], pequenas: [11, 66, 52, 134] }[e.orejas];
+    [o[1], o[3]].forEach(function (x) {
+      s += '<circle ' + marca + ' cx="' + x + '" cy="' + o[2] + '" r="' + o[0] + '"/>';
+      if (!panda) s += '<circle cx="' + x + '" cy="' + o[2] + '" r="' + Math.round(o[0] / 2) + '" fill="#8EC5E8"/>';
+    });
+  }
+
+  s += '<circle ' + piel + ' cx="100" cy="86" r="48"/><ellipse cx="100" cy="102" rx="20" ry="15" fill="' + t.hocico + '"/>';   // cabeza
+  s += '<circle cx="76" cy="98" r="6" fill="#F28FA6" opacity=".7"/><circle cx="124" cy="98" r="6" fill="#F28FA6" opacity=".7"/>';
+  if (panda) s += '<ellipse cx="82" cy="80" rx="11" ry="14" fill="' + D + '" transform="rotate(20 82 80)"/><ellipse cx="118" cy="80" rx="11" ry="14" fill="' + D + '" transform="rotate(-20 118 80)"/>' +
+    '<circle cx="82" cy="78" r="4.5" fill="#fff"/><circle cx="118" cy="78" r="4.5" fill="#fff"/><circle cx="82" cy="78" r="2.2" fill="' + D + '"/><circle cx="118" cy="78" r="2.2" fill="' + D + '"/>';
+  else s += '<circle cx="82" cy="78" r="5" fill="' + K + '"/><circle cx="118" cy="78" r="5" fill="' + K + '"/>';
+  s += '<ellipse cx="100" cy="95" rx="6.5" ry="4.8" fill="' + (panda ? D : K) + '"/><path d="M100 100v6M100 106q-6 5-12 0M100 106q6 5 12 0" fill="none" stroke="' + K + '" stroke-width="3" stroke-linecap="round"/>';
+
+  if (e.lentes) s += '<circle cx="82" cy="78" r="12" fill="rgba(142,197,232,.35)" stroke="' + K + '" stroke-width="3"/><circle cx="118" cy="78" r="12" fill="rgba(142,197,232,.35)" stroke="' + K + '" stroke-width="3"/><path d="M94 78H106M70 76L56 72M130 76L144 72" fill="none" stroke="' + K + '" stroke-width="3" stroke-linecap="round"/>';
+  if (e.cabeza === 'lazo') s += '<path d="M134 46L112 34V58ZM134 46L156 34V58Z" fill="' + acc + '"' + trazo + '/><circle cx="134" cy="46" r="6" fill="#fff"' + trazo + '/>';
+  if (e.cabeza === 'gorro') s += '<path d="M100 2L70 54H130Z" fill="' + acc + '"' + trazo + '/><path d="M86 30H114" stroke="#fff" stroke-width="4" stroke-linecap="round"/><circle cx="100" cy="4" r="7" fill="#fff"' + trazo + '/>';
+  if (e.cabeza === 'corona') s += '<path d="M70 54L74 20L88 36L100 12L112 36L126 20L130 54Z" fill="#F6C945"' + trazo + '/><circle cx="100" cy="40" r="4" fill="#F7A8B8"/>';
+  return s;
+}
+
+// Dibuja el peluche del personalizador y actualiza el nombre y el mensaje.
+function dibujar() {
+  escena.innerHTML = '<svg viewBox="0 0 200 240" role="img" aria-label="' + L('Peluche ', 'Plush ') + T(TIPOS[estado.tipo].n) + '">' + cuerpoSVG(estado) + '</svg>';
+  document.getElementById('hola').textContent = nombreIn.value.trim() ? L('Hola, soy ', "Hi, I'm ") + nombreIn.value.trim() : L('Ponle nombre a tu peluche', 'Give your plush a name');
+  document.getElementById('nota').textContent = msgIn.value.trim() || L('Aquí aparecerá tu mensaje especial.', 'Your special message will appear here.');
+}
+
+// Convierte un peluche prediseñado en una imagen SVG (data URI) para usarla dentro de <img>.
+function imagenOso(nombre) {
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240">' + cuerpoSVG(PRESETS[nombre]) + '</svg>';
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+// Asigna la imagen a cada <img data-oso="...">.
+document.querySelectorAll('img[data-oso]').forEach(function (img) { img.src = imagenOso(img.dataset.oso); });
+
+// Detecta los cambios realizados en las opciones de personalización.
+ctrl.addEventListener('change', function (ev) {
+  const el = ev.target;
+  if (el.type === 'checkbox') estado[el.name] = el.checked;
+  else {
+    estado[el.name] = el.value;
+    if (el.name === 'tipo') {                              // cada tipo trae su color base
+      estado.color = TIPOS[el.value].color;
+      ctrl.querySelectorAll('input[name=color]').forEach(function (r) { r.checked = r.value === estado.color; });
+    }
+  }
+  dibujar();
+});
+nombreIn.addEventListener('input', dibujar);
+msgIn.addEventListener('input', dibujar);
+// Restaura todas las opciones del peluche a sus valores iniciales.
+document.getElementById('reset').addEventListener('click', function () {
+  estado = Object.assign({}, INICIO);
+  nombreIn.value = ''; msgIn.value = '';
+  construir(); dibujar();
+});
+construir();
+dibujar();
+
+/* ==================== EJEMPLO DE JAVASCRIPT: CONTADOR DE ABRAZOS ==================== */
+const boton = document.getElementById('btn-abrazo');
+const salida = document.getElementById('salida-abrazo');
+let abrazos = 0;
+function darAbrazo() {
+  abrazos = abrazos + 1;
+  salida.textContent = L('Abrazos: ', 'Hugs: ') + abrazos;
+}
+boton.addEventListener('click', darAbrazo);
+boton.addEventListener('mouseover', () => boton.style.background = '#8EC5E8');
+boton.addEventListener('mouseout', () => boton.style.background = '');
+
+/* ==================== EJEMPLOS DE ANIMACIÓN ==================== */
+const btnFade = document.getElementById('btn-fade');
+const caja = document.getElementById('caja');
+const panel = document.getElementById('panel');
+
+btnFade.addEventListener('click', function () {
+  caja.style.display = 'none';
+  requestAnimationFrame(function () {
+    caja.style.display = 'block';
+    caja.style.opacity = '0';
+    caja.style.transform = 'translateY(12px)';
+    caja.style.transition = 'opacity .45s ease, transform .45s ease';
+    requestAnimationFrame(function () {
+      caja.style.opacity = '1';
+      caja.style.transform = 'translateY(0)';
+    });
+  });
+});
+
+panel.style.display = 'block';
+document.getElementById('btn-slide').addEventListener('click', function () {
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+});
+
+/* ==================== EJEMPLO DE JSON ==================== */
+// Valida y procesa el JSON escrito por el usuario.
+document.getElementById('btn-json').addEventListener('click', function () {
+  const salidaJson = document.getElementById('salida');
+  const texto = document.getElementById('entrada').value;
+  try {
+    const objeto = JSON.parse(texto);   // cadena JSON -> objeto JS
+    salidaJson.textContent = L('Válido. El peluche se llama ', 'Valid. The plush is named ') + objeto.nombre;
+  } catch (error) {
+    salidaJson.textContent = L('JSON inválido: ', 'Invalid JSON: ') + error.message;
+  }
+});
+
+/* ==================== CARRUSEL (Bootstrap, crossfade) ==================== */
+// El carrusel avanza solo; este botón permite pausarlo y reanudarlo (accesibilidad).
+const galeria = bootstrap.Carousel.getOrCreateInstance('#galeria');
+const btnPausa = document.getElementById('galeria-pausa');
+let enPausa = false;
+function ponerPausa(valor) {
+  enPausa = valor;
+  if (enPausa) galeria.pause(); else galeria.cycle();
+  btnPausa.textContent = enPausa ? L('Reanudar', 'Resume') : L('Pausar', 'Pause');
+}
+btnPausa.addEventListener('click', function () { ponerPausa(!enPausa); });
+if (matchMedia('(prefers-reduced-motion: reduce)').matches) ponerPausa(true); // respeta a quien prefiere menos movimiento
+
+/* ==================== PÁGINA: 15 HERRAMIENTAS DE IA DE GOOGLE ==================== */
+// Cada herramienta tiene categoría, descripción, pasos de uso y una idea para CuddleMe.
+const HERRAMIENTAS = [
+  { id: 'gemini', n: 'Gemini', e: '✨', cat: 'Estudio', g: ['#FFE3EA', '#F7A8B8'], url: 'https://gemini.google.com/',
+    d: 'El asistente de IA de Google: conversa, resume, traduce, explica y ayuda a escribir.',
+    pasos: ['Entra a gemini.google.com con tu cuenta de Google.', 'Escribe lo que necesitas con detalle: quién eres, qué quieres y en qué formato.', 'Pide mejoras en la misma conversación ("hazlo más corto", "explícalo con un ejemplo").', 'Prueba funciones como Deep Research para investigar un tema con fuentes.'],
+    limite: 'El nivel gratuito tiene límites de uso y, según lo investigado, desde el 9 de octubre de 2026 usa el modelo Flash-Lite; los modelos más potentes quedan para los planes de pago.',
+    idea: 'Pedirle ideas de nombres y mensajes de tarjeta para cada tipo de ocasión: cumpleaños, graduación o San Valentín.' },
+  { id: 'notebook', n: 'Gemini Notebook (NotebookLM)', e: '📓', cat: 'Estudio', g: ['#E4F2FB', '#8EC5E8'], url: 'https://notebooklm.google.com/',
+    d: 'Responde solo con tus propios documentos y cita de dónde sacó cada dato.',
+    pasos: ['Crea un cuaderno nuevo.', 'Sube tus fuentes: PDF, documentos de Google, enlaces o texto.', 'Haz preguntas y revisa las citas que apuntan a la fuente original.', 'Genera un resumen en audio, un cuestionario o una guía de estudio.'],
+    limite: 'Es gratis con cuenta de Google. Los planes de pago aumentan los límites, por ejemplo los resúmenes de audio.',
+    idea: 'Subir la descripción del producto y las políticas de envío para generar una lista de preguntas frecuentes sin inventar datos.' },
+  { id: 'learn', n: 'Learn Your Way', e: '🎓', cat: 'Estudio', g: ['#F1E8FB', '#C9B6E8'], url: 'https://learnyourway.withgoogle.com/',
+    d: 'Convierte un texto o tema en una lección adaptada a tus intereses, con audio, quizzes y mapas mentales.',
+    pasos: ['Abre la herramienta e inicia sesión con tu cuenta de Google.', 'Sube un material o elige uno de ejemplo.', 'Indica tu nivel y tus intereses para que adapte los ejemplos.', 'Estudia con la lección, escucha la versión en audio y responde los cuestionarios.'],
+    limite: 'Es un experimento de Google Labs. Puede cambiar o no estar disponible en todos los países.',
+    idea: 'Transformar los apuntes de esta página (JavaScript, JSON y DNS) en una lección con quiz para repasar antes del examen.' },
+  { id: 'teachable', n: 'Teachable Machine', e: '🤖', cat: 'Estudio', g: ['#EAF6EC', '#9AD3AA'], url: 'https://teachablemachine.withgoogle.com/',
+    d: 'Entrena un modelo de IA con tu cámara o tus archivos, sin escribir código.',
+    pasos: ['Elige un proyecto: imágenes, audio o poses.', 'Crea clases (por ejemplo "oso panda" y "oso polar") y sube o graba ejemplos de cada una.', 'Pulsa "Entrenar modelo" y espera unos segundos.', 'Prueba el modelo en vivo y expórtalo para usarlo en una página web.'],
+    limite: 'Es gratis y funciona en el navegador.',
+    idea: 'Entrenar un modelo que reconozca el tipo de oso desde una foto y sugiera accesorios.' },
+  { id: 'flow', n: 'Google Flow', e: '🎬', cat: 'Creatividad', g: ['#FFF3C9', '#F6C945'], url: 'https://labs.google/flow',
+    d: 'Estudio de IA para crear videos e imágenes a partir de descripciones y unir varias escenas.',
+    pasos: ['Entra con tu cuenta de Google y crea un proyecto nuevo.', 'Describe la escena con detalle: personaje, lugar, luz y movimiento.', 'Genera el clip y elige la mejor versión.', 'Encadena varios clips para armar una historia corta.'],
+    limite: 'Usa créditos diarios gratuitos que no se acumulan, según lo investigado. Los planes de pago agregan más.',
+    idea: 'Hacer un video corto de un peluche que cobra vida para el banner del sitio.' },
+  { id: 'flowmusic', n: 'Flow Music', e: '🎵', cat: 'Creatividad', g: ['#FDE3F0', '#F28FA6'], url: 'https://labs.google/',
+    d: 'Estudio de música donde conversas con una productora virtual para crear canciones.',
+    pasos: ['Abre Flow Music desde Google Labs (si está disponible en tu país).', 'Cuéntale el estilo, el ánimo y de qué trata la canción.', 'Escucha el resultado y pide cambios: más lento, otra voz, otro estribillo.', 'Descarga la pista final.'],
+    limite: 'Tiene créditos diarios gratuitos y su uso gratuito es no comercial.',
+    idea: 'Crear una melodía corta de cuna para el video de presentación de CuddleMe.' },
+  { id: 'pomelli', n: 'Pomelli', e: '📣', cat: 'Creatividad', g: ['#FFE9D6', '#FFB88A'], url: 'https://labs.google/pomelli',
+    d: 'Lee tu sitio web, aprende el estilo de tu marca y genera publicaciones para redes sociales.',
+    pasos: ['Entra a Pomelli e ingresa la dirección de tu sitio.', 'Revisa el perfil de marca que genera: colores, tipografía y tono.', 'Pídele ideas de campaña y elige las que te gusten.', 'Edita los textos e imágenes y descárgalos.'],
+    limite: 'Está en beta gratuita. La disponibilidad por país cambia.',
+    idea: 'Generar publicaciones de San Valentín con la paleta rosa y cacao de CuddleMe.' },
+  { id: 'stitch', n: 'Stitch', e: '🖌️', cat: 'Creatividad', g: ['#E4F2FB', '#B9DDF3'], url: 'https://stitch.withgoogle.com/',
+    d: 'Diseña pantallas de apps y sitios a partir de texto o bocetos, y exporta el código.',
+    pasos: ['Entra a stitch.withgoogle.com.', 'Describe la pantalla: "tienda de peluches, fondo rosa, tarjetas redondas".', 'Ajusta colores y diseño con nuevas instrucciones.', 'Copia el HTML y CSS generado o expórtalo a una herramienta de diseño.'],
+    limite: 'Gratis mientras esté en Google Labs.',
+    idea: 'Probar un rediseño de la página de inicio y comparar ideas antes de programar.' },
+  { id: 'disco', n: 'Disco (GenTabs)', e: '🗂️', cat: 'Creatividad', g: ['#EEF6FB', '#C9B6E8'], url: 'https://labs.google/disco',
+    d: 'Experimento de Google Labs que convierte tus pestañas abiertas en pequeñas apps interactivas.',
+    pasos: ['Instala o abre Disco desde Google Labs si está disponible para tu cuenta.', 'Abre varias pestañas sobre un mismo tema.', 'Pídele que arme una app con esa información: un comparador, un plan de viaje o una lista.', 'Ajusta la app con instrucciones y compártela.'],
+    limite: 'Es un experimento con acceso limitado; puede requerir lista de espera.',
+    idea: 'Comparar en una sola vista varios materiales de peluches seguros para bebés.' },
+  { id: 'aistudio', n: 'Google AI Studio', e: '🧪', cat: 'Desarrollo', g: ['#E4F2FB', '#8EC5E8'], url: 'https://aistudio.google.com/',
+    d: 'Laboratorio para probar los modelos Gemini, obtener una clave de API y crear prototipos de apps.',
+    pasos: ['Entra a aistudio.google.com con tu cuenta.', 'Escribe un prompt y elige el modelo.', 'Ajusta parámetros como la creatividad (temperatura).', 'Pulsa "Get API key" para usar el modelo desde tu propio código.'],
+    limite: 'Tiene un nivel gratuito con límites de peticiones por minuto y por día.',
+    idea: 'Prototipar un asistente que recomiende un peluche según la ocasión y el presupuesto.' },
+  { id: 'opal', n: 'Opal', e: '🧩', cat: 'Desarrollo', g: ['#F1E8FB', '#C9B6E8'], url: 'https://opal.google/',
+    d: 'Crea mini apps de IA sin programar: describes el flujo y Opal lo arma como diagrama.',
+    pasos: ['Abre Opal e inicia sesión.', 'Describe tu app: "recibe un nombre y una ocasión y escribe un mensaje de tarjeta".', 'Revisa el flujo visual y cambia los pasos que quieras.', 'Publica la app y comparte el enlace.'],
+    limite: 'Es un experimento gratuito de Google Labs; su disponibilidad depende del país.',
+    idea: 'Una mini app que escriba el mensaje especial de la tarjeta del peluche.' },
+  { id: 'jules', n: 'Jules', e: '🛠️', cat: 'Desarrollo', g: ['#EAF6EC', '#9AD3AA'], url: 'https://jules.google/',
+    d: 'Agente de programación que trabaja en segundo plano: lee tu repositorio, hace cambios y abre un pull request.',
+    pasos: ['Entra a jules.google e inicia sesión.', 'Conecta tu cuenta de GitHub y elige el repositorio.', 'Escribe la tarea: "agrega un botón de modo oscuro".', 'Revisa el plan y el pull request antes de aceptar los cambios.'],
+    limite: 'El nivel gratuito permite un número limitado de tareas por día (según lo investigado, alrededor de 15).',
+    idea: 'Pedirle que revise el repositorio de este proyecto y proponga mejoras de accesibilidad.' },
+  { id: 'geminicli', n: 'Gemini CLI', e: '⌨️', cat: 'Desarrollo', g: ['#E9E4DE', '#B9A99A'], url: 'https://github.com/google-gemini/gemini-cli',
+    d: 'Asistente de Gemini dentro de la terminal para explicar, escribir y corregir código.',
+    pasos: ['Instala Node.js y ejecuta el comando de instalación que aparece en el repositorio oficial.', 'Escribe gemini en la terminal dentro de la carpeta de tu proyecto.', 'Inicia sesión con tu cuenta de Google cuando lo pida.', 'Pregunta cosas como "explica cómo funciona el personalizador" o "corrige este error".'],
+    limite: 'Es de código abierto y su uso gratuito tiene límites de peticiones.',
+    idea: 'Pedirle que explique cada parte del código del sitio para preparar la exposición.' },
+  { id: 'codeassist', n: 'Gemini Code Assist', e: '👩‍💻', cat: 'Desarrollo', g: ['#FFF3C9', '#F9DE8A'], url: 'https://codeassist.google/',
+    d: 'Asistente que autocompleta código y responde dudas dentro de VS Code y otros editores.',
+    pasos: ['Instala la extensión de Gemini Code Assist en tu editor.', 'Inicia sesión con tu cuenta de Google.', 'Escribe un comentario o una función y acepta las sugerencias con la tecla Tab.', 'Abre el chat del editor para preguntar sobre tu código.'],
+    limite: 'Tiene un nivel gratuito para uso individual, con límites diarios.',
+    idea: 'Autocompletar las funciones repetidas del personalizador y generar comentarios.' },
+  { id: 'colab', n: 'Google Colab con Gemini', e: '📊', cat: 'Desarrollo', g: ['#FFE9D6', '#FFC58F'], url: 'https://colab.research.google.com/',
+    d: 'Cuadernos de Python en el navegador, con ayuda de Gemini para escribir y explicar el código.',
+    pasos: ['Entra a colab.research.google.com y crea un cuaderno nuevo.', 'Sube un archivo de datos, por ejemplo un CSV de pedidos.', 'Pide a Gemini el código: "muestra cuántos peluches se vendieron por color".', 'Ejecuta la celda y revisa el gráfico o la tabla.'],
+    limite: 'Es gratis con recursos de cómputo limitados.',
+    idea: 'Analizar qué colores y accesorios se eligen más para decidir qué fabricar.' }
+];
+
+// Textos en inglés de cada herramienta (mismo id que en HERRAMIENTAS).
+const HERR_EN = {"gemini":{"d":"Google's AI assistant: it chats, summarizes, translates, explains and helps you write.","pasos":["Go to gemini.google.com with your Google account.","Write what you need in detail: who you are, what you want and in what format.","Ask for improvements in the same conversation (\"make it shorter\", \"explain it with an example\").","Try features like Deep Research to investigate a topic with sources."],"limite":"The free tier has usage limits and, according to our research, from October 9, 2026 it uses the Flash-Lite model; the more powerful models are reserved for paid plans.","idea":"Ask it for name and card-message ideas for each type of occasion: birthday, graduation or Valentine's Day."},"notebook":{"d":"It answers only from your own documents and cites where it got each piece of information.","pasos":["Create a new notebook.","Upload your sources: PDFs, Google Docs, links or text.","Ask questions and check the citations that point to the original source.","Generate an audio summary, a quiz or a study guide."],"limite":"It is free with a Google account. Paid plans raise the limits, for example for audio summaries.","idea":"Upload the product description and the shipping policies to generate a list of frequently asked questions without making up data."},"learn":{"d":"Turns a text or topic into a lesson adapted to your interests, with audio, quizzes and mind maps.","pasos":["Open the tool and sign in with your Google account.","Upload a material or choose an example one.","Enter your level and interests so it adapts the examples.","Study with the lesson, listen to the audio version and answer the quizzes."],"limite":"It is a Google Labs experiment. It may change or not be available in every country.","idea":"Turn the notes on this page (JavaScript, JSON and DNS) into a lesson with a quiz to review before the exam."},"teachable":{"d":"Train an AI model with your camera or your files, without writing code.","pasos":["Choose a project: images, audio or poses.","Create classes (for example \"panda bear\" and \"polar bear\") and upload or record examples of each.","Press \"Train model\" and wait a few seconds.","Test the model live and export it to use on a web page."],"limite":"It is free and works in the browser.","idea":"Train a model that recognizes the bear type from a photo and suggests accessories."},"flow":{"d":"AI studio for creating videos and images from descriptions and joining several scenes together.","pasos":["Sign in with your Google account and create a new project.","Describe the scene in detail: character, place, light and movement.","Generate the clip and pick the best version.","Chain several clips together to build a short story."],"limite":"It uses free daily credits that do not accumulate, according to our research. Paid plans add more.","idea":"Make a short video of a plush coming to life for the site banner."},"flowmusic":{"d":"Music studio where you talk with a virtual producer to create songs.","pasos":["Open Flow Music from Google Labs (if it is available in your country).","Tell it the style, the mood and what the song is about.","Listen to the result and ask for changes: slower, a different voice, another chorus.","Download the final track."],"limite":"It has free daily credits and its free use is non-commercial.","idea":"Create a short lullaby melody for the CuddleMe presentation video."},"pomelli":{"d":"Reads your website, learns your brand style and generates social media posts.","pasos":["Go to Pomelli and enter your site's address.","Review the brand profile it generates: colors, typography and tone.","Ask it for campaign ideas and pick the ones you like.","Edit the texts and images and download them."],"limite":"It is in free beta. Availability by country changes.","idea":"Generate Valentine's Day posts with CuddleMe's pink and cocoa palette."},"stitch":{"d":"Designs app and website screens from text or sketches, and exports the code.","pasos":["Go to stitch.withgoogle.com.","Describe the screen: \"plush shop, pink background, rounded cards\".","Adjust colors and layout with new instructions.","Copy the generated HTML and CSS or export it to a design tool."],"limite":"Free while it is in Google Labs.","idea":"Try a redesign of the home page and compare ideas before coding."},"disco":{"d":"A Google Labs experiment that turns your open tabs into small interactive apps.","pasos":["Install or open Disco from Google Labs if it is available for your account.","Open several tabs about the same topic.","Ask it to build an app with that information: a comparison tool, a travel plan or a list.","Adjust the app with instructions and share it."],"limite":"It is an experiment with limited access; it may require a waitlist.","idea":"Compare several baby-safe plush materials in a single view."},"aistudio":{"d":"A lab to try the Gemini models, get an API key and build app prototypes.","pasos":["Go to aistudio.google.com with your account.","Write a prompt and choose the model.","Adjust parameters such as creativity (temperature).","Press \"Get API key\" to use the model from your own code."],"limite":"It has a free tier with limits on requests per minute and per day.","idea":"Prototype an assistant that recommends a plush based on the occasion and the budget."},"opal":{"d":"Create AI mini apps without programming: you describe the flow and Opal builds it as a diagram.","pasos":["Open Opal and sign in.","Describe your app: \"takes a name and an occasion and writes a card message\".","Review the visual flow and change any steps you want.","Publish the app and share the link."],"limite":"It is a free Google Labs experiment; its availability depends on the country.","idea":"A mini app that writes the special message for the plush's card."},"jules":{"d":"A programming agent that works in the background: it reads your repository, makes changes and opens a pull request.","pasos":["Go to jules.google and sign in.","Connect your GitHub account and choose the repository.","Write the task: \"add a dark mode button\".","Review the plan and the pull request before accepting the changes."],"limite":"The free tier allows a limited number of tasks per day (according to our research, around 15).","idea":"Ask it to review this project's repository and suggest accessibility improvements."},"geminicli":{"d":"A Gemini assistant inside the terminal to explain, write and fix code.","pasos":["Install Node.js and run the installation command shown in the official repository.","Type gemini in the terminal inside your project folder.","Sign in with your Google account when it asks.","Ask things like \"explain how the customizer works\" or \"fix this error\"."],"limite":"It is open source and its free use has request limits.","idea":"Ask it to explain each part of the site's code to prepare for the presentation."},"codeassist":{"d":"An assistant that autocompletes code and answers questions inside VS Code and other editors.","pasos":["Install the Gemini Code Assist extension in your editor.","Sign in with your Google account.","Write a comment or a function and accept the suggestions with the Tab key.","Open the editor chat to ask about your code."],"limite":"It has a free tier for individual use, with daily limits.","idea":"Autocomplete the repeated functions of the customizer and generate comments."},"colab":{"d":"Python notebooks in the browser, with help from Gemini to write and explain the code.","pasos":["Go to colab.research.google.com and create a new notebook.","Upload a data file, for example a CSV of orders.","Ask Gemini for the code: \"show how many plushies were sold by color\".","Run the cell and review the chart or table."],"limite":"It is free with limited computing resources.","idea":"Analyze which colors and accessories are chosen most to decide what to make."}};
+const CAT_EN = {"Estudio":"Study","Creatividad":"Creativity","Desarrollo":"Development"};
+// Devuelve la herramienta con los textos del idioma activo (nombre y categoría interna no cambian).
+function HX(h) { return LANG === 'en' ? Object.assign({}, h, HERR_EN[h.id], { catN: CAT_EN[h.cat] }) : Object.assign({}, h, { catN: h.cat }); }
+const grid = document.getElementById('herramientas');
+const conteo = document.getElementById('conteo');
+const vacio = document.getElementById('vacio');
+const buscar = document.getElementById('buscar');
+let filtro = 'todas';
+
+// Crea las tarjetas de Bootstrap para cada herramienta (se vuelve a llamar al cambiar de idioma).
+function renderHerramientas() {
+  grid.innerHTML = HERRAMIENTAS.map(function (base) {
+    const h = HX(base);
+    return '<div class="col" data-cat="' + h.cat + '" data-texto="' + (base.n + ' ' + base.d + ' ' + base.cat + ' ' + HERR_EN[base.id].d + ' ' + CAT_EN[base.cat]).toLowerCase() + '">' +
+      '<article class="card tool h-100">' +
+      '<div class="tool-banner" style="--g1:' + h.g[0] + ';--g2:' + h.g[1] + '" aria-hidden="true">' + h.e + '</div>' +
+      '<div class="card-body d-flex flex-column"><span class="cat cat-' + h.cat.toLowerCase() + '">' + h.catN + '</span>' +
+      '<h3>' + h.n + '</h3><p>' + h.d + '</p>' +
+      '<button type="button" class="btn btn-cuddle btn-sm mt-auto" data-id="' + h.id + '">' + L('Cómo se usa', 'How to use it') + '</button></div></article></div>';
+  }).join('');
+}
+renderHerramientas();
+
+// Muestra u oculta tarjetas según la categoría y el texto buscado.
+function aplicarFiltros() {
+  const q = buscar.value.trim().toLowerCase();
+  let visibles = 0;
+  grid.querySelectorAll('.col').forEach(function (c) {
+    const ok = (filtro === 'todas' || c.dataset.cat === filtro) && (!q || c.dataset.texto.indexOf(q) !== -1);
+    const estabaOculta = c.classList.contains('d-none');
+    c.classList.toggle('d-none', !ok);
+    if (ok) { visibles++; if (estabaOculta) { c.classList.remove('pop'); void c.offsetWidth; c.classList.add('pop'); } }
+  });
+  conteo.textContent = L('Mostrando ' + visibles + ' de ' + HERRAMIENTAS.length + ' herramientas', 'Showing ' + visibles + ' of ' + HERRAMIENTAS.length + ' tools');
+  vacio.hidden = visibles !== 0;
+}
+document.querySelectorAll('[data-filtro]').forEach(function (b) {
+  b.addEventListener('click', function () {
+    filtro = b.dataset.filtro;
+    document.querySelectorAll('[data-filtro]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    aplicarFiltros();
+  });
+});
+buscar.addEventListener('input', aplicarFiltros);
+aplicarFiltros();
+
+// Abre la ventana modal con los pasos de la herramienta elegida.
+const modalEl = document.getElementById('modalIA');
+const modalIA = bootstrap.Modal.getOrCreateInstance(modalEl);
+grid.addEventListener('click', function (ev) {
+  const b = ev.target.closest('button[data-id]');
+  if (!b) return;
+  const h = HX(HERRAMIENTAS.find(function (x) { return x.id === b.dataset.id; }));
+  document.getElementById('modalTitulo').textContent = h.e + ' ' + h.n;
+  document.getElementById('modalCuerpo').innerHTML =
+    '<span class="cat cat-' + h.cat.toLowerCase() + ' mb-2">' + h.catN + '</span>' +
+    '<p>' + h.d + '</p><h3>' + L('Cómo se usa', 'How to use it') + '</h3><ol>' + h.pasos.map(function (p) { return '<li>' + p + '</li>'; }).join('') + '</ol>' +
+    '<p><strong>' + L('Límites del nivel gratuito:', 'Free tier limits:') + '</strong> ' + h.limite + '</p>' +
+    '<div class="idea"><strong>' + L('En CuddleMe:', 'At CuddleMe:') + '</strong> ' + h.idea + '</div>';
+  document.getElementById('modalLink').href = h.url;
+  document.getElementById('modalLink').textContent = L('Abrir herramienta', 'Open tool');
+  modalIA.show();
+});
+
+/* ==================== CUESTIONARIO ==================== */
+// Arreglo que contiene las preguntas, opciones, respuestas correctas y explicaciones.
+const preguntas = [
+  { t: "¿Qué lenguaje define el comportamiento de una página web?", o: ["HTML", "CSS", "JavaScript", "JSON"], c: 2, x: "HTML da estructura, CSS da estilo y JavaScript define el comportamiento." },
+  { t: "¿Por qué un cambio de DNS puede tardar hasta 48 horas en verse en todo el mundo?", o: ["Porque hay que reiniciar el navegador", "Por la propagación DNS: los servidores guardan la respuesta anterior hasta que vence su TTL", "Porque hay que comprar otro dominio", "Porque cambia el TLD"], c: 1, x: "Cada servidor guarda la respuesta anterior hasta que vence su TTL; ese reparto gradual es la propagación." },
+  { t: "Verdadero o falso: el evento mouseover se activa cuando el cursor pasa sobre un elemento.", o: ["Verdadero", "Falso"], c: 0, x: "Es el evento de hover. Se conecta a una función con addEventListener." },
+  { t: "¿Qué símbolo es la función principal de jQuery?", o: ["#", "$", "@", "%"], c: 1, x: "Con $ se selecciona un elemento y se le aplica una acción, por ejemplo $('#caja').hide()." },
+  { t: "Verdadero o falso: hoy es obligatorio usar jQuery para manipular el DOM.", o: ["Verdadero", "Falso"], c: 1, x: "Falso. JavaScript moderno ofrece querySelector, classList y fetch, así que jQuery ya no es necesario." },
+  { t: "¿Qué método de jQuery abre y cierra un elemento con un deslizamiento?", o: ["fadeIn", "hide", "slideToggle", "addClass"], c: 2, x: "slideToggle alterna entre mostrar y ocultar deslizando el elemento." },
+  { t: "En JSON, ¿cómo deben escribirse las claves?", o: ["Sin comillas", "Con comillas simples", "Con comillas dobles", "Entre paréntesis"], c: 2, x: "JSON exige comillas dobles en claves y textos." },
+  { t: "¿Qué hace JSON.parse?", o: ["Convierte un objeto en texto", "Convierte una cadena JSON en un objeto", "Envía datos al servidor", "Borra un objeto"], c: 1, x: "parse convierte texto JSON en un objeto de JavaScript; stringify hace lo contrario." },
+  { t: "Con un repositorio de GitHub conectado a Vercel, ¿qué ocurre al hacer git push?", o: ["Nada hasta pagar el dominio", "Vercel despliega el sitio de nuevo automáticamente", "El repositorio se borra", "El sitio pasa a ser privado"], c: 1, x: "Vercel detecta el push y publica la nueva versión sin pasos manuales." },
+  { t: "En tienda.cuddleme.com, ¿cuál es el TLD?", o: [".com", "cuddleme", "tienda", ".tienda.cuddleme"], c: 0, x: "El TLD es el final del dominio (.com). 'tienda' es el subdominio y 'cuddleme' el nombre del dominio." },
+  { t: "¿Qué clase de Bootstrap hace que el carrusel cambie de imagen con un efecto de desvanecimiento (crossfade)?", o: ["carousel-fade", "carousel-slide", "fade-in", "carousel-dark"], c: 0, x: "Se agrega carousel-fade junto a las clases carousel slide del contenedor." },
+  { t: "¿Para qué sirve Gemini Notebook (NotebookLM)?", o: ["Para programar tareas en GitHub", "Para responder con tus propios documentos y citar las fuentes", "Para componer música", "Para registrar dominios"], c: 1, x: "Trabaja sobre las fuentes que subes y muestra de dónde sale cada respuesta." }
+];
+// Preguntas del cuestionario en inglés (mismo orden y mismas respuestas correctas).
+const preguntasEN = [{"t":"Which language defines the behavior of a web page?","o":["HTML","CSS","JavaScript","JSON"],"c":2,"x":"HTML provides structure, CSS provides style and JavaScript defines behavior."},{"t":"Why can a DNS change take up to 48 hours to show up worldwide?","o":["Because the browser has to be restarted","Because of DNS propagation: servers keep the previous answer until its TTL expires","Because you have to buy another domain","Because the TLD changes"],"c":1,"x":"Each server keeps the previous answer until its TTL expires; that gradual spread is propagation."},{"t":"True or false: the mouseover event fires when the cursor passes over an element.","o":["True","False"],"c":0,"x":"It is the hover event. It is connected to a function with addEventListener."},{"t":"Which symbol is jQuery's main function?","o":["#","$","@","%"],"c":1,"x":"With $ you select an element and apply an action to it, for example $('#caja').hide()."},{"t":"True or false: using jQuery to manipulate the DOM is mandatory today.","o":["True","False"],"c":1,"x":"False. Modern JavaScript offers querySelector, classList and fetch, so jQuery is no longer necessary."},{"t":"Which jQuery method opens and closes an element with a sliding motion?","o":["fadeIn","hide","slideToggle","addClass"],"c":2,"x":"slideToggle switches between showing and hiding the element by sliding it."},{"t":"In JSON, how must keys be written?","o":["Without quotes","With single quotes","With double quotes","In parentheses"],"c":2,"x":"JSON requires double quotes on keys and strings."},{"t":"What does JSON.parse do?","o":["Converts an object into text","Converts a JSON string into an object","Sends data to the server","Deletes an object"],"c":1,"x":"parse converts JSON text into a JavaScript object; stringify does the opposite."},{"t":"With a GitHub repository connected to Vercel, what happens when you run git push?","o":["Nothing until you pay for the domain","Vercel redeploys the site automatically","The repository is deleted","The site becomes private"],"c":1,"x":"Vercel detects the push and publishes the new version with no manual steps."},{"t":"In tienda.cuddleme.com, which part is the TLD?","o":[".com","cuddleme","tienda",".tienda.cuddleme"],"c":0,"x":"The TLD is the end of the domain (.com). 'tienda' is the subdomain and 'cuddleme' is the domain name."},{"t":"Which Bootstrap class makes the carousel change images with a fade effect (crossfade)?","o":["carousel-fade","carousel-slide","fade-in","carousel-dark"],"c":0,"x":"carousel-fade is added alongside the carousel slide classes on the container."},{"t":"What is Gemini Notebook (NotebookLM) for?","o":["Programming tasks on GitHub","Answering with your own documents and citing the sources","Composing music","Registering domains"],"c":1,"x":"It works on the sources you upload and shows where each answer comes from."}];
+const cont = document.getElementById('quiz'), res = document.getElementById('resultado'), otra = document.getElementById('reiniciar');
+let aciertos = 0, hechas = 0;
+
+// Genera dinámicamente todas las preguntas del cuestionario.
+function pintar() {
+  aciertos = 0; hechas = 0; res.hidden = true; otra.hidden = true; cont.innerHTML = '';
+  const Q = LANG === 'en' ? preguntasEN : preguntas;
+  Q.forEach(function (p, i) {
+    const f = document.createElement('fieldset'); f.className = 'q';
+    f.innerHTML = '<legend>' + (i + 1) + '. ' + p.t + '</legend>' +
+      p.o.map(function (txt, j) { return '<label><input type="radio" name="p' + i + '" value="' + j + '"> ' + txt + '</label>'; }).join('') +
+      '<p class="fb" aria-live="polite"></p>';
+    f.addEventListener('change', function (ev) {
+      const elegida = Number(ev.target.value), labels = f.querySelectorAll('label');
+      f.querySelectorAll('input').forEach(function (r) { r.disabled = true; });
+      labels[p.c].classList.add('right');
+      const ok = elegida === p.c;
+      if (!ok) labels[elegida].classList.add('wrong');
+      f.querySelector('.fb').textContent = (ok ? L('Correcto. ', 'Correct. ') : L('Incorrecto. ', 'Incorrect. ')) + p.x;
+      if (ok) aciertos++;
+      hechas++;
+      if (hechas === Q.length) {
+        res.textContent = L('Tu resultado: ' + aciertos + ' de ' + Q.length, 'Your score: ' + aciertos + ' of ' + Q.length);
+        res.hidden = false; otra.hidden = false;
+        res.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+    cont.appendChild(f);
+  });
+}
+// Reinicia el cuestionario y vuelve al inicio de la página.
+otra.addEventListener('click', function () { pintar(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+pintar();
+
+/* ==================== MODO CLARO Y OSCURO ==================== */
+// Guarda la preferencia en localStorage (con try/catch por si el navegador la bloquea).
+const raiz = document.documentElement;
+const btnTema = document.getElementById('tema');
+function aplicarTema(tema, guardar) {
+  raiz.setAttribute('data-bs-theme', tema);
+  const oscuro = tema === 'dark';
+  btnTema.setAttribute('aria-pressed', String(oscuro));
+  document.getElementById('tema-icono').textContent = oscuro ? '☀️' : '🌙';
+  document.getElementById('tema-txt').textContent = oscuro ? L('Modo claro', 'Light mode') : L('Modo oscuro', 'Dark mode');
+  if (guardar) { try { localStorage.setItem('cuddle-tema', tema); } catch (e) {} }
+}
+aplicarTema(raiz.getAttribute('data-bs-theme') || 'light', false);
+btnTema.addEventListener('click', function () {
+  aplicarTema(raiz.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark', true);
+});
+// Si la persona no eligió un tema a mano, sigue los cambios del sistema operativo.
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (ev) {
+  let guardado = null;
+  try { guardado = localStorage.getItem('cuddle-tema'); } catch (e) {}
+  if (!guardado) aplicarTema(ev.matches ? 'dark' : 'light', false);
+});
+
+/* ==================== NAVEGACIÓN SUAVE ENTRE SECCIONES ==================== */
+// Cambia de sección con un desvanecimiento, sin recargar la página.
+(function () {
+  const vistas = document.querySelectorAll('.vista'), links = document.querySelectorAll('#barra .nav-link');
+  const main = document.querySelector('main'), menu = document.getElementById('menu');
+  const reducido = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let primera = true;
+
+  function mostrar(id) {
+    vistas.forEach(function (v) { v.classList.toggle('on', v.id === id); });
+    links.forEach(function (a) {
+      if (a.getAttribute('href') === '#' + id) { a.classList.add('active'); a.setAttribute('aria-current', 'page'); }
+      else { a.classList.remove('active'); a.removeAttribute('aria-current'); }
+    });
+    document.title = document.querySelector('#barra .nav-link[href="#' + id + '"]').textContent + ' | CuddleMe';
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    main.classList.remove('saliendo');
+  }
+
+  function ir() {
+    let id = (location.hash || '#inicio').slice(1);
+    const destino = document.getElementById(id);
+    if (!destino || !destino.classList.contains('vista')) id = 'inicio';
+    // Cierra el menú plegable en pantallas pequeñas.
+    if (menu.classList.contains('show')) bootstrap.Collapse.getOrCreateInstance(menu).hide();
+    if (primera || reducido) { primera = false; mostrar(id); return; }
+    main.classList.add('saliendo');
+    setTimeout(function () { mostrar(id); }, 180);
+  }
+  window.addEventListener('hashchange', ir);
+  ir();
+})();
+
+/* ==================== EFECTOS DE SCROLL ==================== */
+// La barra se compacta al bajar y aparece un botón para volver arriba.
+(function () {
+  const barra = document.getElementById('barra'), subir = document.getElementById('subir');
+  let pendiente = false;
+  function actualizar() {
+    barra.classList.toggle('scrolled', window.scrollY > 40);
+    subir.classList.toggle('visible', window.scrollY > 500);
+    pendiente = false;
+  }
+  window.addEventListener('scroll', function () {
+    if (!pendiente) { pendiente = true; requestAnimationFrame(actualizar); }
+  }, { passive: true });
+  subir.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  actualizar();
+})();
+</script>
+
+<!-- Traducción ES/EN: cambia los textos estáticos, atributos y vuelve a dibujar las partes generadas con JavaScript. -->
+<script>
+/* ==================== TRADUCCIÓN ES / EN ==================== */
+const I18N_DICT = {"Inicio":"Home","JavaScript":"JavaScript","jQuery":"jQuery","JSON":"JSON","Hosting y Dominios":"Hosting & Domains","IA de Google":"Google AI","Cuestionario Web":"Web Quiz","Contacto":"Contact","CuddleMe":"CuddleMe","Un abrazo que puedes personalizar. Empieza con un peluche liso y hazlo tuyo.":"A hug you can personalize. Start with a plain plush and make it yours.","Nombre":"Name","Mensaje especial":"Special message","Empezar de nuevo":"Start over","Galería de peluches":"Plush gallery","Clásico con lazo":"Classic with a bow","El favorito para cumpleaños: marrón cálido, almohadillas rosas y un lazo que lo hace especial.":"The birthday favorite: warm brown, pink paw pads and a bow that makes it special.","Panda estudioso":"Studious panda","Con lentes puestos, listo para acompañar una graduación o regalarle ánimo a alguien en exámenes.":"Wearing glasses, ready to keep someone company at graduation or cheer them on during exams.","Polar con bufanda":"Polar with a scarf","Pensado para abrazar en días fríos. Los zapatitos y la bufanda combinan en tono.":"Made for cuddling on cold days. The booties and the scarf match in tone.","Dorado con corona":"Golden with a crown","Para aniversarios y San Valentín: camiseta con corazón y corona de rey o reina.":"For anniversaries and Valentine's Day: a heart T-shirt and a king or queen crown.","Lila con orejas de gatito":"Lilac with kitten ears","Una mezcla divertida de oso y gatito. Las combinaciones se eligen en el personalizador de arriba.":"A fun mix of bear and kitten. You choose the combinations in the customizer above.","<span class=\"carousel-control-prev-icon\" aria-hidden=\"true\"></span><span class=\"visually-hidden\">Anterior</span>":"<span class=\"carousel-control-prev-icon\" aria-hidden=\"true\"></span><span class=\"visually-hidden\">Previous</span>","<span class=\"carousel-control-next-icon\" aria-hidden=\"true\"></span><span class=\"visually-hidden\">Siguiente</span>":"<span class=\"carousel-control-next-icon\" aria-hidden=\"true\"></span><span class=\"visually-hidden\">Next</span>","Pausar":"Pause","El producto":"The product","Nombre comercial":"Brand name","Descripción":"Description","CuddleMe crea peluches suaves hechos a pedido. Cada cliente diseña el suyo en la página: elige el tipo de oso (clásico, panda, polar o dorado), el color, las orejas, las patitas, los accesorios, la ropita, el nombre y un mensaje especial que llega en una tarjeta con el peluche. Los ojos son bordados para que sean seguros para niños pequeños, y cada pieza se prepara con cariño antes de enviarse.":"CuddleMe makes soft, made-to-order plush toys. Each customer designs their own on the site: choose the type of bear (classic, panda, polar or golden), the color, the ears, the paws, the accessories, the outfit, the name and a special message that arrives on a card with the plush. The eyes are embroidered so they are safe for small children, and each piece is prepared with care before it is shipped.","Se personaliza con":"Customize with","Tipo de oso":"Bear type","Color":"Color","Orejas":"Ears","Patitas":"Paws","Accesorios":"Accessories","Ropita":"Outfit","Nombre y mensaje":"Name and message","Público objetivo":"Target audience","Familiares y amigos que buscan un regalo con significado: padres y abuelos de niños de 0 a 10 años, y también jóvenes y adultos que quieren sorprender a su pareja o a un amigo en cumpleaños, aniversarios, graduaciones o San Valentín.":"Family and friends looking for a meaningful gift: parents and grandparents of children aged 0 to 10, and also young people and adults who want to surprise a partner or a friend on birthdays, anniversaries, graduations or Valentine's Day.","Propuesta de valor":"Value proposition","Un peluche que es único porque lo diseñas tú. No regalas un objeto cualquiera: regalas un compañero con nombre, estilo y un mensaje propio, que se vuelve un recuerdo.":"A plush that is one of a kind because you design it. You're not giving just any object: you're giving a companion with a name, a style and a message of its own, which becomes a keepsake.","Frase de marca":"Brand tagline","“Un abrazo que puedes personalizar.”":"“A hug you can personalize.”","Logotipo":"Logo","El logo es la cara de un osito de peluche con mejillas sonrojadas y orejas de dos colores. Usa formas redondas y sin esquinas para transmitir suavidad y ternura, justo lo que se siente al abrazar un peluche. Los detalles azules dentro de las orejas hacen que se vea distinto de un osito genérico y se ve bien sobre fondos claros, rosas y oscuros.":"The logo is the face of a teddy bear with rosy cheeks and two-tone ears. It uses round shapes with no corners to convey softness and tenderness, just what it feels like to hug a plush. The blue details inside the ears make it look different from a generic teddy bear, and it looks good on light, pink and dark backgrounds.","Paleta de colores":"Color palette","Rosa algodón":"Cotton pink","Representa ternura, cariño y dulzura. Es el color principal de la marca y evoca el afecto de un abrazo.":"Represents tenderness, affection and sweetness. It is the brand's main color and evokes the warmth of a hug.","Café cacao":"Cocoa brown","Transmite calidez, cercanía y confianza, y recuerda al pelaje de un osito. Se usa en textos y contornos porque se lee bien sobre colores claros.":"Conveys warmth, closeness and trust, and recalls a teddy bear's fur. It is used for text and outlines because it reads well on light colors.","Azul cielo":"Sky blue","Se asocia con calma, seguridad e infancia. Equilibra la dulzura del rosa y da un acento fresco y diferente.":"Associated with calm, safety and childhood. It balances the sweetness of the pink and adds a fresh, different accent.","Blanco rosado":"Blush white","Fondo muy suave que da sensación de pureza y limpieza, y deja respirar el contenido.":"A very soft background that gives a sense of purity and cleanliness and lets the content breathe.","En el modo oscuro el fondo pasa a un café muy profundo y el texto a un rosa pálido. El rosa y el azul se mantienen iguales para que la marca se reconozca en los dos modos.":"In dark mode the background changes to a very deep brown and the text to a pale pink. The pink and the blue stay the same so the brand is recognizable in both modes.","JavaScript (JS vanilla)":"JavaScript (vanilla JS)","JavaScript es el lenguaje de programación de los navegadores. Se usa en el desarrollo web para que una página reaccione a lo que hace la persona: clics, teclas, formularios y datos que llegan de un servidor. \"Vanilla\" significa JavaScript puro, sin librerías. En CuddleMe, por ejemplo, es lo que hace que el peluche de la página de inicio cambie de color mientras eliges.":"JavaScript is the programming language of web browsers. It is used in web development so that a page reacts to what the person does: clicks, keystrokes, forms and data that arrives from a server. \"Vanilla\" means plain JavaScript, without libraries. In CuddleMe, for example, it is what makes the plush on the home page change color while you choose.","HTML, CSS y JS: tres capas":"HTML, CSS and JS: three layers","Una página web se construye con tres lenguajes que se complementan. Piensa en un peluche: el HTML es el cuerpo, el CSS es el color y la ropita, y el JavaScript es lo que lo hace \"hablar\" cuando lo abrazas.":"A web page is built with three languages that complement each other. Think of a plush toy: HTML is the body, CSS is the color and the little outfit, and JavaScript is what makes it \"talk\" when you hug it.","Lenguaje":"Language","Papel":"Role","Ejemplo en CuddleMe":"Example in CuddleMe","HTML":"HTML","Estructura: qué contenido hay":"Structure: what content there is","El título, los campos de nombre y mensaje, la imagen del peluche":"The title, the name and message fields, the plush image","CSS":"CSS","Estilo: cómo se ve":"Style: how it looks","El rosa de la marca, la tipografía redondeada, los espacios":"The brand pink, the rounded typography, the spacing","Comportamiento: qué hace":"Behavior: what it does","El peluche cambia de color o de accesorio al elegir una opción":"The plush changes color or accessory when you choose an option","Conceptos básicos":"Basic concepts","<strong>Variables:</strong> guardan datos para usarlos después. Se declaran con <code>let</code> (el valor puede cambiar) o <code>const</code> (no se vuelve a asignar).":"<strong>Variables:</strong> store data to use later. They are declared with <code>let</code> (the value can change) or <code>const</code> (it is not reassigned).","<strong>Funciones:</strong> bloques de código con nombre que se ejecutan cuando se necesitan.":"<strong>Functions:</strong> named blocks of code that run when they are needed.","<strong>Eventos:</strong> cosas que ocurren en la página, como <code>click</code> (hacer clic) o <code>mouseover</code> (pasar el cursor, también llamado hover). Con <code>addEventListener</code> se conecta una función a un evento.":"<strong>Events:</strong> things that happen on the page, such as <code>click</code> or <code>mouseover</code> (moving the cursor over an element, also called hover). <code>addEventListener</code> connects a function to an event.","Ejemplo práctico":"Practical example","El siguiente código usa una variable, una función y dos eventos. Pruébalo con el botón: haz clic para dar abrazos y pasa el cursor por encima para ver cómo cambia el color.":"The following code uses a variable, a function and two events. Try it with the button: click to give hugs and move the cursor over it to see the color change.","Dar un abrazo":"Give a hug","Cómo se lee, paso a paso":"How to read it, step by step","Con <code>getElementById</code> se buscan en el HTML el botón y el texto donde se mostrará el resultado.":"<code>getElementById</code> finds the button and the text where the result will be shown in the HTML.","La variable <code>abrazos</code> empieza en 0.":"The variable <code>abrazos</code> starts at 0.","La función <code>darAbrazo</code> suma 1 a la variable y actualiza el texto en pantalla.":"The function <code>darAbrazo</code> adds 1 to the variable and updates the text on screen.","Los eventos conectan el botón con las funciones: el clic llama a <code>darAbrazo</code> y el cursor cambia el color del botón.":"The events connect the button to the functions: the click calls <code>darAbrazo</code> and the cursor changes the button's color.","Recursos y bibliografía":"Resources and bibliography","<a href=\"https://developer.mozilla.org/es/docs/Web/JavaScript\">MDN Web Docs: JavaScript</a>":"<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript\">MDN Web Docs: JavaScript</a>","<a href=\"https://developer.mozilla.org/es/docs/Web/Events\">MDN Web Docs: Eventos</a>":"<a href=\"https://developer.mozilla.org/en-US/docs/Web/Events\">MDN Web Docs: Events</a>","<a href=\"https://www.w3schools.com/js/\">W3Schools: JavaScript Tutorial</a>":"<a href=\"https://www.w3schools.com/js/\">W3Schools: JavaScript Tutorial</a>","jQuery es una librería de JavaScript lanzada en 2006. Nació porque los navegadores de esa época interpretaban el JavaScript de formas distintas, y escribir código que funcionara en todos era difícil. jQuery ofrecía una manera corta y uniforme de hacerlo, con el lema de escribir menos y hacer más.":"jQuery is a JavaScript library released in 2006. It was born because the browsers of that era interpreted JavaScript in different ways, and writing code that worked in all of them was hard. jQuery offered a short, uniform way to do it, with the motto of writing less and doing more.","Sintaxis básica":"Basic syntax","El símbolo <code>$</code> es la función principal de jQuery. El patrón siempre es el mismo: seleccionar un elemento y aplicarle una acción.":"The <code>$</code> symbol is jQuery's main function. The pattern is always the same: select an element and apply an action to it.","Para usarla hay que cargar el archivo de jQuery antes de tu código, por ejemplo desde un CDN:":"To use it you have to load the jQuery file before your code, for example from a CDN:","Ventajas y desventajas frente a JavaScript moderno":"Pros and cons compared to modern JavaScript","Ventajas":"Pros","Sintaxis corta y fácil de leer.":"Short syntax that is easy to read.","Efectos y animaciones listos para usar.":"Ready-to-use effects and animations.","Hay mucho código y plugins existentes, por eso aún aparece en proyectos antiguos.":"There is a lot of existing code and plugins, which is why it still shows up in older projects.","Desventajas":"Cons","Es una descarga extra que hace la página más pesada.":"It is an extra download that makes the page heavier.","Casi todo lo que resolvía ya existe en JavaScript moderno (<code>querySelector</code>, <code>classList</code>, <code>fetch</code>).":"Almost everything it solved already exists in modern JavaScript (<code>querySelector</code>, <code>classList</code>, <code>fetch</code>).","Los frameworks actuales usan otro enfoque y no dependen de jQuery.":"Current frameworks use a different approach and do not depend on jQuery.","Comparación: JS vanilla y jQuery":"Comparison: vanilla JS and jQuery","La misma tarea escrita de las dos formas, lado a lado:":"The same task written both ways, side by side:","Tarea":"Task","JS vanilla":"Vanilla JS","Seleccionar un elemento":"Select an element","Escuchar un clic":"Listen for a click","Ocultar un elemento":"Hide an element","Agregar una clase":"Add a class","Cambiar el texto":"Change the text","Efectos típicos":"Typical effects","Dos efectos clásicos de jQuery: <code>fadeIn</code> (aparecer poco a poco) y <code>slideToggle</code> (abrir y cerrar deslizando). Pruébalos:":"Two classic jQuery effects: <code>fadeIn</code> (appear gradually) and <code>slideToggle</code> (open and close by sliding). Try them:","fadeIn: ver mensaje":"fadeIn: show message","slideToggle: ver accesorios":"slideToggle: show accessories","💌 “Un abrazo que puedes personalizar.”":"💌 “A hug you can personalize.”","<strong>Accesorios disponibles:</strong> lazo, gorro de fiesta, corona, bufanda y lentes.":"<strong>Available accessories:</strong> bow, party hat, crown, scarf and glasses.","<a href=\"https://api.jquery.com/\">jQuery API Documentation</a>":"<a href=\"https://api.jquery.com/\">jQuery API Documentation</a>","<a href=\"https://jquery.com/\">jQuery: sitio oficial</a>":"<a href=\"https://jquery.com/\">jQuery: official site</a>","<a href=\"https://www.w3schools.com/jquery/\">W3Schools: jQuery Tutorial</a>":"<a href=\"https://www.w3schools.com/jquery/\">W3Schools: jQuery Tutorial</a>","JSON (JavaScript Object Notation) es un formato de texto para representar datos. Es ligero, fácil de leer para una persona y fácil de procesar para casi cualquier lenguaje de programación. Por eso es el estándar para intercambiar datos entre aplicaciones y servidores: un peluche de CuddleMe, con su nombre, color y mensaje, puede viajar como JSON del formulario a la fábrica.":"JSON (JavaScript Object Notation) is a text format for representing data. It is lightweight, easy for a person to read and easy for almost any programming language to process. That is why it is the standard for exchanging data between applications and servers: a CuddleMe plush, with its name, color and message, can travel as JSON from the form to the factory.","Estructura básica":"Basic structure","<strong>Objeto:</strong> conjunto de pares clave-valor entre llaves <code>{ }</code>.":"<strong>Object:</strong> a set of key-value pairs between braces <code>{ }</code>.","<strong>Arreglo:</strong> lista ordenada de valores entre corchetes <code>[ ]</code>.":"<strong>Array:</strong> an ordered list of values between square brackets <code>[ ]</code>.","<strong>Valores permitidos:</strong> texto, número, <code>true</code> o <code>false</code>, <code>null</code>, objetos y arreglos.":"<strong>Allowed values:</strong> text, number, <code>true</code> or <code>false</code>, <code>null</code>, objects and arrays.","<strong>Regla clave:</strong> las claves y los textos siempre van entre comillas dobles.":"<strong>Key rule:</strong> keys and strings always go between double quotes.","Objeto de JavaScript y cadena JSON":"JavaScript object and JSON string","Se parecen mucho, pero son cosas distintas: el objeto vive dentro del programa, y la cadena JSON es texto que se puede guardar o enviar.":"They look very similar but are different things: the object lives inside the program, and the JSON string is text that can be saved or sent.","Objeto JS":"JS object","Cadena JSON":"JSON string","Diferencia":"Difference","Claves":"Keys","Con o sin comillas":"With or without quotes","Siempre con comillas dobles":"Always with double quotes","Comillas simples":"Single quotes","Permitidas":"Allowed","No permitidas":"Not allowed","Funciones y comentarios":"Functions and comments","Permitidos":"Allowed","No permitidos":"Not allowed","Dos métodos convierten entre ambos: <code>JSON.stringify(objeto)</code> crea la cadena y <code>JSON.parse(cadena)</code> vuelve a crear el objeto.":"Two methods convert between the two: <code>JSON.stringify(object)</code> creates the string and <code>JSON.parse(string)</code> creates the object again.","Pruébalo":"Try it","<strong>Edita el JSON y pulsa el botón:</strong>":"<strong>Edit the JSON and press the button:</strong>","Convertir con JSON.parse":"Convert with JSON.parse","Cómo lo usan las aplicaciones web":"How web applications use it","Cuando una página necesita datos (por ejemplo, el estado de un pedido), el navegador envía una petición a un servidor o a una API. El servidor responde con texto en formato JSON, y el código de la página lo convierte en objetos para mostrarlo en pantalla. También funciona al revés: al enviar el formulario de personalización, la página manda los datos del peluche como JSON.":"When a page needs data (for example, the status of an order), the browser sends a request to a server or an API. The server responds with text in JSON format, and the page's code converts it into objects to show on screen. It also works the other way around: when the customization form is submitted, the page sends the plush's data as JSON.","<a href=\"https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/JSON\">MDN: JSON</a>":"<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON\">MDN: JSON</a>","<a href=\"https://www.json.org/json-es.html\">JSON.org (especificación)</a>":"<a href=\"https://www.json.org/json-en.html\">JSON.org (specification)</a>","<a href=\"https://www.w3schools.com/js/js_json_intro.asp\">W3Schools: JSON Tutorial</a>":"<a href=\"https://www.w3schools.com/js/js_json_intro.asp\">W3Schools: JSON Tutorial</a>","Web hosting y dominios":"Web hosting and domains","Una página web es un conjunto de archivos. Para que otras personas la vean, esos archivos deben estar en un servidor conectado a internet (hosting), y alguien debe poder encontrarlos con un nombre fácil de recordar (dominio).":"A web page is a set of files. For other people to see it, those files must be on a server connected to the internet (hosting), and people must be able to find them with an easy-to-remember name (domain).","Web hosting":"Web hosting","El hosting es el servicio que guarda tus archivos en un servidor que está encendido todo el tiempo y los entrega a quien los pida.":"Hosting is the service that stores your files on a server that is on all the time and delivers them to whoever asks for them.","Tipo":"Type","Cómo funciona":"How it works","Útil para":"Useful for","Compartido":"Shared","Varios sitios comparten un mismo servidor":"Several sites share the same server","Sitios pequeños con poco tráfico y presupuesto bajo":"Small sites with little traffic and a low budget","VPS":"VPS","Una parte reservada de un servidor, con control sobre el sistema":"A reserved part of a server, with control over the system","Proyectos que necesitan configuración propia":"Projects that need their own configuration","Nube":"Cloud","Recursos repartidos en muchos servidores que crecen según la demanda":"Resources spread across many servers that grow with demand","Sitios con tráfico variable o que deben escalar":"Sites with variable traffic or that need to scale","Cómo funciona Vercel para sitios estáticos":"How Vercel works for static sites","Un sitio estático son archivos HTML, CSS y JS que no necesitan procesarse en el servidor, como este. Vercel es una plataforma en la nube pensada para publicarlos:":"A static site is made of HTML, CSS and JS files that do not need to be processed on the server, like this one. Vercel is a cloud platform designed to publish them:","Conectas tu repositorio de GitHub a Vercel.":"You connect your GitHub repository to Vercel.","Vercel toma los archivos y los publica en su red de servidores repartidos por el mundo (CDN), así la página carga desde un lugar cercano.":"Vercel takes the files and publishes them on its network of servers spread around the world (CDN), so the page loads from a nearby location.","Te da una URL pública con el formato <code>nombre-proyecto.vercel.app</code> y HTTPS incluido.":"It gives you a public URL in the format <code>project-name.vercel.app</code> with HTTPS included.","Cada vez que haces <code>git push</code>, Vercel vuelve a desplegar el sitio automáticamente.":"Every time you run <code>git push</code>, Vercel redeploys the site automatically.","Dominios":"Domains","Un <strong>nombre de dominio</strong> es la dirección legible de un sitio (como <code>cuddleme.com</code>). Reemplaza a la dirección IP, que es un número difícil de recordar. Se compra por año a un registrador.":"A <strong>domain name</strong> is the readable address of a site (such as <code>cuddleme.com</code>). It replaces the IP address, which is a number that is hard to remember. It is bought yearly from a registrar.","<strong>TLD (dominio de nivel superior):</strong> el final del dominio, como <code>.com</code> (comercial), <code>.net</code> (redes) o <code>.org</code> (organizaciones).":"<strong>TLD (top-level domain):</strong> the end of the domain, such as <code>.com</code> (commercial), <code>.net</code> (networks) or <code>.org</code> (organizations).","<strong>Dominio:</strong> el nombre que eliges, junto a su TLD.":"<strong>Domain:</strong> the name you choose, together with its TLD.","<strong>Subdominio:</strong> una sección antes del dominio, como <code>tienda</code> en <code>tienda.cuddleme.com</code>, que sirve para separar partes del sitio.":"<strong>Subdomain:</strong> a section before the domain, such as <code>tienda</code> in <code>tienda.cuddleme.com</code>, used to separate parts of the site.","Propagación DNS":"DNS propagation","El DNS es la \"guía telefónica\" de internet: traduce dominios a direcciones IP. Así ocurre una consulta:":"DNS is the internet's \"phone book\": it translates domains into IP addresses. This is how a lookup happens:","Escribes <code>tienda.cuddleme.com</code> en el navegador.":"You type <code>tienda.cuddleme.com</code> in the browser.","El navegador y el sistema operativo buscan la IP en su memoria (caché). Si no la tienen, preguntan al resolver DNS de tu proveedor de internet.":"The browser and the operating system look for the IP in their memory (cache). If they don't have it, they ask your internet provider's DNS resolver.","El resolver consulta a un servidor raíz, que lo envía al servidor del TLD (<code>.com</code>).":"The resolver asks a root server, which sends it to the TLD server (<code>.com</code>).","El servidor del TLD indica cuál es el servidor DNS autoritativo del dominio, que guarda los registros reales.":"The TLD server says which is the domain's authoritative DNS server, which holds the real records.","El servidor autoritativo responde con la dirección IP del hosting.":"The authoritative server responds with the hosting's IP address.","El navegador se conecta a esa IP y recibe la página. La respuesta queda en caché por un tiempo.":"The browser connects to that IP and receives the page. The response is cached for a while.","Cuando cambias un registro DNS (por ejemplo, apuntar tu dominio a Vercel), los servidores del mundo no se enteran al instante: cada uno guarda la respuesta anterior hasta que vence su TTL (tiempo de vida). A ese reparto gradual se le llama <strong>propagación</strong> y puede tardar desde minutos hasta 48 horas.":"When you change a DNS record (for example, pointing your domain to Vercel), the servers around the world don't find out instantly: each one keeps the previous answer until its TTL (time to live) expires. This gradual spread is called <strong>propagation</strong> and can take from a few minutes up to 48 hours.","<a href=\"https://vercel.com/docs\">Vercel Docs</a>":"<a href=\"https://vercel.com/docs\">Vercel Docs</a>","<a href=\"https://developer.mozilla.org/es/docs/Glossary/DNS\">MDN: DNS (glosario)</a>":"<a href=\"https://developer.mozilla.org/en-US/docs/Glossary/DNS\">MDN: DNS (glossary)</a>","<a href=\"https://developer.mozilla.org/es/docs/Glossary/TLD\">MDN: TLD (glosario)</a>":"<a href=\"https://developer.mozilla.org/en-US/docs/Glossary/TLD\">MDN: TLD (glossary)</a>","<a href=\"https://www.w3schools.com/whatis/whatis_hosting.asp\">W3Schools: Web Hosting</a>":"<a href=\"https://www.w3schools.com/whatis/whatis_hosting.asp\">W3Schools: Web Hosting</a>","15 IA de Google":"15 Google AI tools","Google ofrece herramientas de inteligencia artificial que puedes probar sin pagar con una cuenta personal. Aquí están 15, agrupadas por lo que te ayudan a hacer. Pulsa \"Cómo se usa\" en cada una para ver los pasos y una idea aplicada a CuddleMe.":"Google offers artificial intelligence tools that you can try for free with a personal account. Here are 15, grouped by what they help you do. Press \"How to use it\" on each one to see the steps and an idea applied to CuddleMe.","Cómo elegimos las herramientas":"How we chose the tools","<strong>Nivel gratuito real:</strong> todas se pueden empezar a usar sin tarjeta, aunque con límites diarios o de uso.":"<strong>Truly free tier:</strong> all of them can be started without a card, though with daily or usage limits.","<strong>Utilidad para el proyecto:</strong> cada una tiene una idea concreta para una tienda de peluches personalizados.":"<strong>Usefulness for the project:</strong> each one has a concrete idea for a custom plush shop.","<strong>Variedad:</strong> hay herramientas para estudiar, para crear contenido y para programar, porque un sitio web necesita las tres cosas.":"<strong>Variety:</strong> there are tools for studying, for creating content and for programming, because a website needs all three.","Todas":"All","Estudio":"Study","Creatividad":"Creativity","Desarrollo":"Development","Buscar herramienta":"Search tool","No hay herramientas con ese nombre. Borra la búsqueda o elige otra categoría.":"There are no tools with that name. Clear the search or choose another category.","<strong>Antes de usarlas:</strong> los límites gratuitos y los países disponibles cambian con frecuencia, y varias herramientas de Google Labs son experimentos. Revisa el enlace oficial de cada una. Dejamos fuera Whisk, porque según lo investigado Google movió sus funciones a Flow en 2026.":"<strong>Before using them:</strong> free limits and available countries change often, and several Google Labs tools are experiments. Check the official link for each one. We left out Whisk because, according to our research, Google moved its features to Flow in 2026.","<a href=\"https://labs.google/\">Google Labs</a>":"<a href=\"https://labs.google/\">Google Labs</a>","<a href=\"https://blog.google/products-and-platforms/products/education/back-to-school-2026/\">Google: Back to School 2026</a>":"<a href=\"https://blog.google/products-and-platforms/products/education/back-to-school-2026/\">Google: Back to School 2026</a>","<a href=\"https://aistudio.google.com/\">Google AI Studio</a>":"<a href=\"https://aistudio.google.com/\">Google AI Studio</a>","Cuestionario web":"Web quiz","Doce preguntas basadas en las páginas de este sitio. Elige una respuesta en cada una para ver al instante si es correcta. Si te equivocas, lee la explicación y repasa la página correspondiente.":"Twelve questions based on the pages of this site. Choose an answer for each one to see right away whether it is correct. If you get one wrong, read the explanation and review the corresponding page.","Intentar de nuevo":"Try again","¿Tienes una pregunta sobre tu peluche personalizado? Escríbenos y nos pondremos en contacto contigo.":"Do you have a question about your custom plush? Write to us and we will get in touch with you.","Nombre completo *":"Full name *","Correo electrónico *":"Email address *","Teléfono (opcional)":"Phone (optional)","Motivo de contacto *":"Reason for contact *","Selecciona una opción":"Select an option","Consulta sobre productos":"Product inquiry","Personalización de peluche":"Plush customization","Pedido o entrega":"Order or delivery","Precio y disponibilidad":"Price and availability","Queja o sugerencia":"Complaint or suggestion","Otro":"Other","Mensaje *":"Message *","Escribe al menos 10 caracteres para explicar tu consulta.":"Write at least 10 characters to explain your inquiry.","Enviar mensaje ✉️":"Send message ✉️","Los campos con * son obligatorios. Usaremos tus datos únicamente para responder a tu consulta.":"Fields marked with * are required. We will use your data only to reply to your inquiry.","Abrir herramienta":"Open tool","Cerrar":"Close","CuddleMe es una marca creada para un proyecto académico de desarrollo web.":"CuddleMe is a brand created for an academic web development project."};
+const I18N_ATTR = {"Principal":"Main","Abrir menú":"Open menu","Osito":"Teddy","Feliz cumpleaños, te quiero mucho":"Happy birthday, I love you so much","Galería de peluches CuddleMe":"CuddleMe plush gallery","Oso clásico marrón con un lazo azul en la cabeza y almohadillas en las patitas":"Classic brown bear with a blue bow on its head and pads on its paws","Panda con lentes y almohadillas":"Panda with glasses and paw pads","Oso polar con bufanda azul y zapatitos":"Polar bear with a blue scarf and booties","Oso dorado con corona y camiseta con corazón":"Golden bear with a crown and a heart T-shirt","Oso lila con orejas de gatito y lentes":"Lilac bear with kitten ears and glasses","Diapositiva 1":"Slide 1","Diapositiva 2":"Slide 2","Diapositiva 3":"Slide 3","Diapositiva 4":"Slide 4","Diapositiva 5":"Slide 5","Logotipo sobre fondo claro":"Logo on a light background","Logotipo sobre fondo rosa":"Logo on a pink background","Logotipo sobre fondo oscuro":"Logo on a dark background","tienda.cuddleme.com dividido en subdominio, dominio y TLD":"tienda.cuddleme.com split into subdomain, domain and TLD","Filtrar herramientas":"Filter tools","Buscar herramienta":"Search tool","Osito de CuddleMe":"CuddleMe teddy","Escribe tu nombre":"Type your name","tucorreo@ejemplo.com":"youremail@example.com","Tu número de contacto":"Your contact number","Cuéntanos cómo podemos ayudarte...":"Tell us how we can help you...","Cerrar":"Close","Volver arriba":"Back to top"};
+/* Selecciona los elementos de texto estático que se pueden traducir. */
+function i18nCollect(doc) {
+  var SEL = 'h1,h2,h3,p,li:not(.nav-item),td,th,dt,dd,label,legend,button,option,strong,.form-text,.nota-pie,.box,a.nav-link,.modal-footer a,#vacio';
+  var EXCL = 'pre,script,style,#ctrl,#quiz,#herramientas,#modalCuerpo,.stage,.carousel-indicators,#tema,#idioma,#galeria-pausa,#salida,#salida-abrazo,#resultado,#conteo,#modalTitulo';
+  var BLOCK = 'ul,ol,p,div,table,li,dl,section,pre,textarea,select,form,button,input';
+  var list = Array.prototype.filter.call(doc.querySelectorAll(SEL), function (el) {
+    if (el.closest(EXCL)) return false;
+    if (el.querySelector(BLOCK)) return false;
+    if (!el.innerHTML.trim()) return false;
+    var codes = Array.prototype.map.call(el.querySelectorAll('code'), function (c) { return c.textContent; }).join('').trim();
+    if (el.children.length && el.textContent.trim() === codes) return false;
+    return /[A-Za-zÁÉÍÓÚáéíóúñ¿¡]{3,}/.test(el.textContent);
+  });
+  return list.filter(function (el) {
+    return !list.some(function (o) { return o !== el && o.contains(el); });
+  });
+}
+
+function aplicarIdioma(lang, guardar) {
+  LANG = lang;
+  document.documentElement.lang = lang;
+  // 1) Textos estáticos: se guarda el original en data-es y se cambia el contenido.
+  i18nCollect(document).forEach(function (el) {
+    if (el.dataset.es === undefined) el.dataset.es = el.innerHTML;
+    const key = el.dataset.es.trim();
+    el.innerHTML = (lang === 'en' && I18N_DICT[key]) ? I18N_DICT[key] : el.dataset.es;
+  });
+  // 2) Atributos: placeholder, aria-label y alt.
+  document.querySelectorAll('[placeholder],[aria-label],[alt]').forEach(function (el) {
+    if (el.id === 'idioma' || el.closest('#quiz,#ctrl,#herramientas')) return;
+    ['placeholder', 'aria-label', 'alt'].forEach(function (a) {
+      if (!el.hasAttribute(a)) return;
+      if (!el.hasAttribute('data-es-' + a)) el.setAttribute('data-es-' + a, el.getAttribute(a));
+      const orig = el.getAttribute('data-es-' + a);
+      el.setAttribute(a, (lang === 'en' && I18N_ATTR[orig]) ? I18N_ATTR[orig] : orig);
+    });
+  });
+  // 3) Partes generadas con JavaScript.
+  construir(); dibujar();
+  renderHerramientas(); aplicarFiltros();
+  pintar();
+  salida.textContent = L('Abrazos: ', 'Hugs: ') + abrazos;
+  document.getElementById('salida').textContent = '';
+  btnPausa.textContent = enPausa ? L('Reanudar', 'Resume') : L('Pausar', 'Pause');
+  aplicarTema(raiz.getAttribute('data-bs-theme') || 'light', false);
+  modalIA.hide();
+  // 4) Botón de idioma y título de la pestaña.
+  document.getElementById('idioma-txt').textContent = lang === 'en' ? 'ES' : 'EN';
+  const activo = document.querySelector('#barra .nav-link.active');
+  if (activo) document.title = activo.textContent + ' | CuddleMe';
+  if (guardar) { try { localStorage.setItem('cuddle-lang', lang); } catch (e) {} }
+}
+document.getElementById('idioma').addEventListener('click', function () {
+  aplicarIdioma(LANG === 'en' ? 'es' : 'en', true);
+});
+aplicarIdioma(LANG, false);
+</script>
+</body></html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JavaScript | CuddleMe</title>
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="top"><a class="brand" href="index.html"><img src="logo.svg" alt="" width="40" height="40"><span>CuddleMe</span></a>
+<nav aria-label="Principal"><a href="index.html">Inicio</a><a href="javascript.html" aria-current="page">JavaScript</a><a href="jquery.html">jQuery</a><a href="json.html">JSON</a><a href="hosting.html">Hosting y Dominios</a><a href="cuestionario.html">Cuestionario Web</a></nav></header>
+<main class="page"><div class="wrap">
+<h1>JavaScript (JS vanilla)</h1>
+<p class="lead">JavaScript es el lenguaje de programación de los navegadores. Se usa en el desarrollo web para que una página reaccione a lo que hace la persona: clics, teclas, formularios y datos que llegan de un servidor. "Vanilla" significa JavaScript puro, sin librerías. En CuddleMe, por ejemplo, es lo que hace que el peluche de la página de inicio cambie de color mientras eliges.</p>
+
+<h2>HTML, CSS y JS: tres capas</h2>
+<p>Una página web se construye con tres lenguajes que se complementan. Piensa en un peluche: el HTML es el cuerpo, el CSS es el color y la ropita, y el JavaScript es lo que lo hace "hablar" cuando lo abrazas.</p>
+<div class="scroll"><table><thead><tr><th>Lenguaje</th><th>Papel</th><th>Ejemplo en CuddleMe</th></tr></thead><tbody>
+<tr><td>HTML</td><td>Estructura: qué contenido hay</td><td>El título, los campos de nombre y mensaje, la imagen del peluche</td></tr>
+<tr><td>CSS</td><td>Estilo: cómo se ve</td><td>El rosa de la marca, la tipografía redondeada, los espacios</td></tr>
+<tr><td>JS</td><td>Comportamiento: qué hace</td><td>El peluche cambia de color o de accesorio al elegir una opción</td></tr></tbody></table></div>
+
+<h2>Conceptos básicos</h2>
+<ul>
+<li><strong>Variables:</strong> guardan datos para usarlos después. Se declaran con <code>let</code> (el valor puede cambiar) o <code>const</code> (no se vuelve a asignar).</li>
+<li><strong>Funciones:</strong> bloques de código con nombre que se ejecutan cuando se necesitan.</li>
+<li><strong>Eventos:</strong> cosas que ocurren en la página, como <code>click</code> (hacer clic) o <code>mouseover</code> (pasar el cursor, también llamado hover). Con <code>addEventListener</code> se conecta una función a un evento.</li></ul>
+
+<h2>Ejemplo práctico</h2>
+<p>El siguiente código usa una variable, una función y dos eventos. Pruébalo con el botón: haz clic para dar abrazos y pasa el cursor por encima para ver cómo cambia el color.</p>
+<pre><code>const boton = document.getElementById('btn-abrazo');
+const salida = document.getElementById('salida-abrazo');
+let abrazos = 0;                      // variable
+
+function darAbrazo() {                // función
+  abrazos = abrazos + 1;
+  salida.textContent = 'Abrazos: ' + abrazos;
+}
+
+boton.addEventListener('click', darAbrazo);                                   // evento click
+boton.addEventListener('mouseover', () =&gt; boton.style.background = '#8EC5E8'); // evento hover
+boton.addEventListener('mouseout',  () =&gt; boton.style.background = '');</code></pre>
+<div class="demo"><button id="btn-abrazo" class="btn">Dar un abrazo</button> <span id="salida-abrazo" aria-live="polite">Abrazos: 0</span></div>
+
+<h3>Cómo se lee, paso a paso</h3>
+<ol>
+<li>Con <code>getElementById</code> se buscan en el HTML el botón y el texto donde se mostrará el resultado.</li>
+<li>La variable <code>abrazos</code> empieza en 0.</li>
+<li>La función <code>darAbrazo</code> suma 1 a la variable y actualiza el texto en pantalla.</li>
+<li>Los eventos conectan el botón con las funciones: el clic llama a <code>darAbrazo</code> y el cursor cambia el color del botón.</li></ol>
+
+<section class="bib"><h2>Recursos y bibliografía</h2><ul>
+<li><a href="https://developer.mozilla.org/es/docs/Web/JavaScript">MDN Web Docs: JavaScript</a></li>
+<li><a href="https://developer.mozilla.org/es/docs/Web/Events">MDN Web Docs: Eventos</a></li>
+<li><a href="https://www.w3schools.com/js/">W3Schools: JavaScript Tutorial</a></li></ul></section>
+</div></main>
+<footer><p>CuddleMe es una marca creada para un proyecto académico de desarrollo web.</p></footer>
+<script>
+const boton = document.getElementById('btn-abrazo');
+const salida = document.getElementById('salida-abrazo');
+let abrazos = 0;
+function darAbrazo() {
+  abrazos = abrazos + 1;
+  salida.textContent = 'Abrazos: ' + abrazos;
+}
+boton.addEventListener('click', darAbrazo);
+boton.addEventListener('mouseover', () => boton.style.background = '#8EC5E8');
+boton.addEventListener('mouseout', () => boton.style.background = '');
+</script>
+</body></html>
