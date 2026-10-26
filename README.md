@@ -1,9 +1,9 @@
 # 🧸 Portafolio de Proyecto Web: CuddleMe
 
 **Estudiante:** [Paola Jezabel Martinez Moreno]
-**Fecha:** [Viernes 16 de octubre de 2026]
-**Enlace al Sitio Web (Vercel):** https://cuddlememain.vercel.app/
-**Repositorio GitHub:** https://github.com/pm2013952-gif/cuddleme_main.gito
+**Fecha:** [lunes 26 de octubre de 2026]
+**Enlace al Sitio Web (Vercel):**https://vercel.com/pm2013952-8931s-projects/cuddleme-peluches
+**Repositorio GitHub:** https://github.com/pm2013952-gif/cUDDLEME1
 
 ---
 
